@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HistoryScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.history</a> &gt; <span class="el_source">HistoryScreen.kt</span></div><h1>HistoryScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.history
+
+import android.app.DatePickerDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.logger.R
+import com.example.logger.core.util.DateFormatter
+import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HistoryScreen(
+    onNavigateBack: () -&gt; Unit,
+<span class="nc" id="L34">    viewModel: HistoryViewModel = hiltViewModel()</span>
+<span class="pc bpc" id="L35" title="10 of 16 branches missed.">) {</span>
+<span class="fc" id="L36">    val vm: HistoryViewModel = viewModel</span>
+<span class="fc" id="L37">    val state by vm.uiState.collectAsState()</span>
+<span class="fc" id="L38">    val context = LocalContext.current</span>
+
+<span class="fc" id="L40">    val inputFormat = remember { DateFormatter.getInputDateFormat() }</span>
+<span class="fc" id="L41">    val displayFormat = remember { DateFormatter.getDisplayDateFormat() }</span>
+    // Calculate yesterday's date for max date validation (IST timezone)
+<span class="fc" id="L43">    val yesterdayMillis = remember {</span>
+<span class="fc" id="L44">        Calendar.getInstance().apply {</span>
+<span class="fc" id="L45">            timeZone = DateFormatter.istTimeZone</span>
+<span class="fc" id="L46">            add(Calendar.DAY_OF_MONTH, -1)</span>
+<span class="fc" id="L47">            set(Calendar.HOUR_OF_DAY, 23)</span>
+<span class="fc" id="L48">            set(Calendar.MINUTE, 59)</span>
+<span class="fc" id="L49">            set(Calendar.SECOND, 59)</span>
+<span class="fc" id="L50">        }.timeInMillis</span>
+    }
+    // Yesterday key for next button validation
+<span class="fc" id="L53">    val yesterdayKey = remember {</span>
+<span class="fc" id="L54">        DateFormatter.getCompactDateFormat().format(</span>
+<span class="fc" id="L55">            Calendar.getInstance().apply {</span>
+<span class="fc" id="L56">                timeZone = DateFormatter.istTimeZone</span>
+<span class="fc" id="L57">                add(Calendar.DAY_OF_MONTH, -1)</span>
+<span class="fc" id="L58">            }.time</span>
+<span class="fc" id="L59">        )</span>
+    }
+
+    fun openDatePicker() {
+<span class="nc" id="L63">        val cal = Calendar.getInstance().apply { time = state.selectedDate }</span>
+<span class="nc" id="L64">        DatePickerDialog(</span>
+<span class="nc" id="L65">            context,</span>
+            { _, y, m, d -&gt;
+<span class="nc" id="L67">                val picked = Calendar.getInstance().apply {</span>
+<span class="nc" id="L68">                    set(y, m, d)</span>
+<span class="nc" id="L69">                }.time</span>
+<span class="nc" id="L70">                vm.onPickDate(picked)</span>
+<span class="nc" id="L71">            },</span>
+<span class="nc" id="L72">            cal.get(Calendar.YEAR),</span>
+<span class="nc" id="L73">            cal.get(Calendar.MONTH),</span>
+<span class="nc" id="L74">            cal.get(Calendar.DAY_OF_MONTH)</span>
+<span class="nc" id="L75">        ).apply {</span>
+            // Set max date to yesterday (exclude today)
+<span class="nc" id="L77">            datePicker.maxDate = yesterdayMillis</span>
+<span class="nc" id="L78">        }.show()</span>
+<span class="nc" id="L79">    }</span>
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    Scaffold(</span>
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.history),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+<span class="fc" id="L95">    ) { innerPadding -&gt;</span>
+
+        val listState = rememberLazyListState()
+
+        // Detect when user reaches the end of the list for infinite scrolling
+        LaunchedEffect(listState, state.canLoadMore) {
+            snapshotFlow {
+                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                val totalItems = listState.layoutInfo.totalItemsCount
+                lastVisibleItem?.index == totalItems - 1 &amp;&amp; totalItems &gt; 0
+            }
+            .collect { isAtEnd -&gt;
+                if (isAtEnd &amp;&amp; state.canLoadMore &amp;&amp; !state.isLoadingMore) {
+                    vm.loadMore()
+                }
+            }
+        }
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = 32.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            /** -------- Header (UNCHANGED) -------- */
+            item {
+                Column {
+
+                    Text(
+                        text = stringResource(R.string.history_subtitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            /** -------- TOP DATE PANEL (UPDATED ONLY) -------- */
+            item {
+                ElevatedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
+                        // Row 1: Date strip with calendar icon
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    MaterialTheme.shapes.small
+                                )
+                                .clickable { openDatePicker() }
+                                .padding(horizontal = 12.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = inputFormat.format(state.selectedDate),
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = Icons.Outlined.CalendarMonth,
+                                contentDescription = &quot;Pick date&quot;
+                            )
+                        }
+
+                        // Row 2: Previous / Date / Next
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            CircleArrowButton(
+                                icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                                enabled = true,
+                                onClick = { vm.onPrevDate() }
+                            )
+
+                            Text(
+                                text = displayFormat.format(state.selectedDate),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            CircleArrowButton(
+                                icon = Icons.Outlined.ArrowForward,
+                                enabled = DateFormatter.getCompactDateFormat().format(state.selectedDate) != yesterdayKey,
+                                onClick = { vm.onNextDate() }
+                            )
+                        }
+                    }
+                }
+            }
+
+            /** -------- LIST &amp; EMPTY STATE -------- */
+            val rows = state.submissions
+
+            if (state.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else if (state.error != null) {
+                item {
+                    val errorMessage = state.error ?: &quot;An error occurred&quot;
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(&quot;⚠️&quot;, style = MaterialTheme.typography.displaySmall)
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = &quot;Error Loading History&quot;,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.W600
+                            )
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else if (rows.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(&quot;📅&quot;, style = MaterialTheme.typography.displaySmall)
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = stringResource(R.string.history_empty_title),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.W600
+                            )
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.history_empty_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                items(rows, key = { it.id }) { s -&gt;
+                    val hasBlocker =
+                        (s.blockers ?: &quot;&quot;).trim().isNotEmpty() &amp;&amp;
+                                (s.blockers ?: &quot;&quot;).lowercase() != &quot;none&quot;
+
+                    // Time is already formatted in IST by the mapper (HH:mm format)
+                    val submittedTime = s.createdAt ?: &quot;--:--&quot;
+
+                    ElevatedCard(elevation = CardDefaults.elevatedCardElevation(4.dp)) {
+                        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+
+                            if (hasBlocker) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(4.dp)
+                                        .fillMaxHeight()
+                                        .background(MaterialTheme.colorScheme.error)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.secondaryContainer,
+                                        modifier = Modifier.size(40.dp)
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Text(
+                                                text = &quot;TM&quot;,
+                                                style = MaterialTheme.typography.labelLarge
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(Modifier.width(12.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = s.teamMember?.name ?: &quot;Team Member #${s.teamMemberId}&quot;,
+                                                style = MaterialTheme.typography.titleMedium
+                                            )
+                                            if (hasBlocker) {
+                                                Spacer(Modifier.width(8.dp))
+                                                Surface(
+                                                    shape = CircleShape,
+                                                    color = MaterialTheme.colorScheme.errorContainer
+                                                ) {
+                                                    Text(
+                                                        text = &quot;⚠ HAS BLOCKER&quot;,
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.error,
+                                                        modifier = Modifier.padding(
+                                                            horizontal = 8.dp,
+                                                            vertical = 2.dp
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        Text(
+                                            text = &quot;Submitted at $submittedTime&quot;,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                Spacer(Modifier.height(12.dp))
+
+                                Text(
+                                    text = &quot;YESTERDAY&quot;,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(text = s.yesterdayWork)
+
+                                Spacer(Modifier.height(8.dp))
+
+                                Text(
+                                    text = &quot;TODAY&quot;,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(text = s.todayPlan)
+
+                                if (hasBlocker) {
+                                    Spacer(Modifier.height(8.dp))
+                                    ElevatedCard(
+                                        colors = CardDefaults.elevatedCardColors(
+                                            containerColor = MaterialTheme.colorScheme.errorContainer
+                                        )
+                                    ) {
+                                        Column(modifier = Modifier.padding(12.dp)) {
+                                            Text(
+                                                text = &quot;⚠ BLOCKERS&quot;,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onErrorContainer
+                                            )
+                                            Text(
+                                                text = s.blockers ?: &quot;&quot;,
+                                                color = MaterialTheme.colorScheme.onErrorContainer
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Loading indicator at the bottom when loading more
+            if (state.isLoadingMore) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+        }
+    }
+<span class="pc bpc" id="L397" title="1 of 2 branches missed.">}</span>
+
+@Composable
+private fun CircleArrowButton(
+    icon: ImageVector,
+    enabled: Boolean,
+    onClick: () -&gt; Unit
+<span class="pc bpc" id="L404" title="9 of 18 branches missed.">) {</span>
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">    Surface(</span>
+<span class="fc" id="L406">        shape = CircleShape,</span>
+<span class="fc" id="L407">        tonalElevation = 2.dp,</span>
+<span class="fc bfc" id="L408" title="All 2 branches covered.">        color = if (enabled)</span>
+<span class="fc" id="L409">            MaterialTheme.colorScheme.surface</span>
+        else
+<span class="fc" id="L411">            MaterialTheme.colorScheme.surfaceVariant,</span>
+<span class="fc" id="L412">        modifier = Modifier</span>
+<span class="fc" id="L413">            .size(40.dp)</span>
+<span class="fc" id="L414">            .clickable(enabled = enabled, onClick = onClick)</span>
+<span class="fc" id="L415">    ) {</span>
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (enabled)
+                    MaterialTheme.colorScheme.onSurface
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+<span class="pc bpc" id="L427" title="1 of 2 branches missed.">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

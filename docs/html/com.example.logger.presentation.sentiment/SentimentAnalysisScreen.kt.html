@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SentimentAnalysisScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.sentiment</a> &gt; <span class="el_source">SentimentAnalysisScreen.kt</span></div><h1>SentimentAnalysisScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.sentiment
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SentimentAnalysisScreen(
+    pos: Int,
+    neu: Int,
+    neg: Int,
+    total: Int,
+    onNavigateBack: () -&gt; Unit
+<span class="nc bnc" id="L48" title="All 22 branches missed.">) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">    Scaffold(</span>
+<span class="nc" id="L50">        topBar = {</span>
+            TopAppBar(
+                title = { Text(&quot;Sentiment Analysis&quot;, color = MaterialTheme.colorScheme.onPrimary) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = &quot;Back&quot;,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+            )
+        }
+<span class="nc" id="L65">    ) { padding -&gt;</span>
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        text = &quot;Overall sentiment distribution&quot;,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PieChart(
+                        positive = pos,
+                        neutral = neu,
+                        negative = neg,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .semantics { contentDescription = &quot;Sentiment pie chart&quot; }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LegendRow(pos = pos, neu = neu, neg = neg)
+
+//                    val insight = when {
+//                        total == 0 -&gt; &quot;No sentiment data available&quot;
+//                        pos - neg &gt; total * 0.3 -&gt; &quot;Very Positive mood&quot;
+//                        pos - neg &gt; 0 -&gt; &quot;Positive mood&quot;
+//                        neg - pos &gt; total * 0.3 -&gt; &quot;Needs attention&quot;
+//                        else -&gt; &quot;Neutral mood&quot;
+//                    }
+//
+//                    Text(
+//                        text = &quot;Based on $total submissions. $insight.&quot;,
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = MaterialTheme.colorScheme.onSurfaceVariant
+//                    )
+                }
+            }
+        }
+    }
+<span class="nc bnc" id="L114" title="All 2 branches missed.">}</span>
+
+@Composable
+private fun PieChart(
+    positive: Int,
+    neutral: Int,
+    negative: Int,
+<span class="nc bnc" id="L121" title="All 2 branches missed.">    modifier: Modifier = Modifier</span>
+<span class="nc bnc" id="L122" title="All 30 branches missed.">) {</span>
+<span class="nc" id="L123">    val total = (positive + neutral + negative).coerceAtLeast(1)</span>
+<span class="nc" id="L124">    val posAngle = 360f * (positive / total.toFloat())</span>
+<span class="nc" id="L125">    val neuAngle = 360f * (neutral / total.toFloat())</span>
+<span class="nc" id="L126">    val negAngle = 360f * (negative / total.toFloat())</span>
+
+<span class="nc" id="L128">    Box(modifier = modifier, contentAlignment = Alignment.Center) {</span>
+<span class="nc" id="L129">        Canvas(modifier = Modifier.fillMaxSize()) {</span>
+<span class="nc" id="L130">            val diameter = size.minDimension</span>
+<span class="nc" id="L131">            val left = (size.width - diameter) / 2f</span>
+<span class="nc" id="L132">            val top = (size.height - diameter) / 2f</span>
+<span class="nc" id="L133">            val chartSize = Size(diameter, diameter)</span>
+<span class="nc" id="L134">            var startAngle = -90f</span>
+
+            // Positive - Green
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (posAngle &gt; 0f) {</span>
+<span class="nc" id="L138">                drawArc(</span>
+<span class="nc" id="L139">                    color = Color(0xFF4CAF50),</span>
+<span class="nc" id="L140">                    startAngle = startAngle,</span>
+<span class="nc" id="L141">                    sweepAngle = posAngle,</span>
+<span class="nc" id="L142">                    useCenter = true,</span>
+<span class="nc" id="L143">                    topLeft = Offset(left, top),</span>
+<span class="nc" id="L144">                    size = chartSize</span>
+                )
+            }
+<span class="nc" id="L147">            startAngle += posAngle</span>
+
+            // Neutral - Amber
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (neuAngle &gt; 0f) {</span>
+<span class="nc" id="L151">                drawArc(</span>
+<span class="nc" id="L152">                    color = Color(0xFFFFC107),</span>
+<span class="nc" id="L153">                    startAngle = startAngle,</span>
+<span class="nc" id="L154">                    sweepAngle = neuAngle,</span>
+<span class="nc" id="L155">                    useCenter = true,</span>
+<span class="nc" id="L156">                    topLeft = Offset(left, top),</span>
+<span class="nc" id="L157">                    size = chartSize</span>
+                )
+            }
+<span class="nc" id="L160">            startAngle += neuAngle</span>
+
+            // Negative - Red
+<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (negAngle &gt; 0f) {</span>
+<span class="nc" id="L164">                drawArc(</span>
+<span class="nc" id="L165">                    color = Color(0xFFF44336),</span>
+<span class="nc" id="L166">                    startAngle = startAngle,</span>
+<span class="nc" id="L167">                    sweepAngle = negAngle,</span>
+<span class="nc" id="L168">                    useCenter = true,</span>
+<span class="nc" id="L169">                    topLeft = Offset(left, top),</span>
+<span class="nc" id="L170">                    size = chartSize</span>
+                )
+            }
+<span class="nc" id="L173">        }</span>
+<span class="nc" id="L174">    }</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">}</span>
+
+@Composable
+<span class="nc bnc" id="L178" title="All 18 branches missed.">private fun LegendRow(pos: Int, neu: Int, neg: Int) {</span>
+<span class="nc" id="L179">    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {</span>
+<span class="nc" id="L180">        LegendItem(color = Color(0xFF4CAF50), label = &quot;Positive&quot;, count = pos)</span>
+<span class="nc" id="L181">        LegendItem(color = Color(0xFFFFC107), label = &quot;Neutral&quot;, count = neu)</span>
+<span class="nc" id="L182">        LegendItem(color = Color(0xFFF44336), label = &quot;Negative&quot;, count = neg)</span>
+<span class="nc" id="L183">    }</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">}</span>
+
+@Composable
+<span class="nc bnc" id="L187" title="All 18 branches missed.">private fun LegendItem(color: Color, label: String, count: Int) {</span>
+<span class="nc" id="L188">    Row(verticalAlignment = Alignment.CenterVertically) {</span>
+<span class="nc" id="L189">        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))</span>
+<span class="nc" id="L190">        Spacer(modifier = Modifier.size(6.dp))</span>
+<span class="nc" id="L191">        Text(text = &quot;$label: $count&quot;, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)</span>
+<span class="nc" id="L192">    }</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

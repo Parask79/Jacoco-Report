@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MissingScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.missing</a> &gt; <span class="el_source">MissingScreen.kt</span></div><h1>MissingScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.missing
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.example.logger.R
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MissingScreen(
+    pendingMembers: List&lt;String&gt;, // Actual list of members who haven't submitted
+    onNavigateBack: () -&gt; Unit,
+    onSubmitStandup: (String) -&gt; Unit // Pass member name
+<span class="pc bpc" id="L25" title="9 of 18 branches missed.">) {</span>
+<span class="fc" id="L26">    val pendingCount = pendingMembers.size</span>
+
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">    Scaffold(</span>
+<span class="fc" id="L29">        topBar = {</span>
+            TopAppBar(
+                title = { Text(stringResource(R.string.missing_title), color = MaterialTheme.colorScheme.onPrimary) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+            )
+        }
+<span class="fc" id="L40">    ) { inner -&gt;</span>
+        Column(modifier = Modifier.fillMaxSize().padding(inner).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column {
+                val suffix = if (pendingCount == 1) &quot;&quot; else &quot;s&quot;
+                Text(text = stringResource(R.string.missing_members_count, pendingCount, suffix), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+
+            if (pendingMembers.isEmpty()) {
+                Column(modifier = Modifier.fillMaxWidth().padding(48.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(&quot;🎉&quot;, style = MaterialTheme.typography.displaySmall)
+                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(R.string.missing_empty_title), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.missing_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(pendingMembers) { name -&gt;
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                val initials = name.split(&quot; &quot;).mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString(&quot;&quot;)
+                                Surface(shape = CircleShape, color = MaterialTheme.colorScheme.secondaryContainer) {
+                                    Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
+                                        Text(initials, color = MaterialTheme.colorScheme.primary)
+                                    }
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(name, style = MaterialTheme.typography.titleMedium)
+                                    Text(stringResource(R.string.missing_row_subtitle), style = MaterialTheme.typography.bodySmall, color = Color(0xFFD32F2F))
+                                }
+                                Button(onClick = { onSubmitStandup(name) }) {
+                                    Icon(Icons.Outlined.EditNote, contentDescription = null)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(&quot;Submit&quot;)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

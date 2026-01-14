@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SubmitStandupViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.submitstandup</a> &gt; <span class="el_source">SubmitStandupViewModel.kt</span></div><h1>SubmitStandupViewModel.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.submitstandup
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.logger.core.datastore.PreferencesManager
+import com.example.logger.core.network.NetworkResult
+import com.example.logger.core.util.DateFormatter
+import com.example.logger.domain.usecase.GetTeamMembersUseCase
+import com.example.logger.domain.usecase.SubmitStandupUseCase
+import com.example.logger.presentation.submitstandup.mapper.SubmitStandupUiMapper
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+<span class="fc" id="L18">data class SubmitStandupUiState(</span>
+<span class="fc" id="L19">    val name: String = &quot;&quot;,</span>
+<span class="fc" id="L20">    val yesterday: String = &quot;&quot;,</span>
+<span class="fc" id="L21">    val today: String = &quot;&quot;,</span>
+<span class="fc" id="L22">    val blockers: String = &quot;&quot;,</span>
+<span class="fc" id="L23">    val isSubmitting: Boolean = false,</span>
+<span class="fc" id="L24">    val error: String? = null,</span>
+<span class="pc" id="L25">    val submittedAt: String? = null,</span>
+<span class="fc" id="L26">    val roster: List&lt;String&gt; = emptyList(),</span>
+<span class="fc" id="L27">    val nameError: Boolean = false,</span>
+<span class="fc" id="L28">    val yesterdayError: Boolean = false,</span>
+<span class="fc" id="L29">    val todayError: Boolean = false</span>
+<span class="fc" id="L30">)</span>
+
+sealed interface SubmitStandupUiEvent {
+    data class ApiError(val message: String): SubmitStandupUiEvent
+    object Submitted: SubmitStandupUiEvent
+}
+
+@HiltViewModel
+<span class="fc" id="L38">class SubmitStandupViewModel @Inject constructor(</span>
+<span class="fc" id="L39">    private val submitUseCase: SubmitStandupUseCase,</span>
+<span class="fc" id="L40">    private val uiMapper: SubmitStandupUiMapper,</span>
+<span class="fc" id="L41">    private val getTeamMembersUseCase: GetTeamMembersUseCase,</span>
+<span class="fc" id="L42">    private val preferencesManager : PreferencesManager</span>
+<span class="fc" id="L43">) : ViewModel() {</span>
+<span class="fc" id="L44">    private val _uiState = MutableStateFlow(SubmitStandupUiState())</span>
+<span class="fc" id="L45">    val uiState: StateFlow&lt;SubmitStandupUiState&gt; = _uiState</span>
+<span class="fc" id="L46">    private val _events = Channel&lt;SubmitStandupUiEvent&gt;(Channel.BUFFERED)</span>
+<span class="fc" id="L47">    val events = _events.receiveAsFlow()</span>
+
+<span class="fc" id="L49">    init {</span>
+        // Fetch team members via use case returning NetworkResult and set roster
+
+<span class="fc" id="L52">        viewModelScope.launch {</span>
+            getTeamMembersUseCase(1, 1, 20).collect { result -&gt;
+                when (result) {
+                    is com.example.logger.core.network.NetworkResult.Success -&gt; {
+                        val names = result.data.map { it.name }
+                        _uiState.value = _uiState.value.copy(
+                            roster = names,
+                            name = if (_uiState.value.name.isBlank() &amp;&amp; names.isNotEmpty()) names.first() else _uiState.value.name
+                        )
+                    }
+                    is com.example.logger.core.network.NetworkResult.Error -&gt; {
+                        // Keep existing roster, optionally set error message
+                        _uiState.value = _uiState.value.copy(error = result.message)
+                    }
+                }
+            }
+        }
+
+<span class="fc" id="L70">    }</span>
+
+    fun setPreSelectedMember(memberName: String) {
+<span class="nc" id="L73">        _uiState.value = _uiState.value.copy(name = memberName)</span>
+<span class="nc" id="L74">    }</span>
+
+<span class="fc" id="L76">    fun onNameChange(v: String) { _uiState.value = _uiState.value.copy(name = v, nameError = false) }</span>
+<span class="fc" id="L77">    fun onYesterdayChange(v: String) { _uiState.value = _uiState.value.copy(yesterday = v, yesterdayError = false) }</span>
+<span class="fc" id="L78">    fun onTodayChange(v: String) { _uiState.value = _uiState.value.copy(today = v, todayError = false) }</span>
+<span class="fc" id="L79">    fun onBlockersChange(v: String) { _uiState.value = _uiState.value.copy(blockers = v) }</span>
+
+    fun submit(onSuccess: (String) -&gt; Unit) {
+<span class="fc" id="L82">        val s = _uiState.value</span>
+<span class="fc" id="L83">        val nameErr = s.name.isBlank()</span>
+<span class="fc" id="L84">        val yErr = s.yesterday.isBlank()</span>
+<span class="fc" id="L85">        val tErr = s.today.isBlank()</span>
+<span class="pc bpc" id="L86" title="2 of 6 branches missed.">        if (nameErr || yErr || tErr) {</span>
+<span class="fc" id="L87">            _uiState.value = s.copy(</span>
+<span class="fc" id="L88">                nameError = nameErr,</span>
+<span class="fc" id="L89">                yesterdayError = yErr,</span>
+<span class="fc" id="L90">                todayError = tErr,</span>
+<span class="fc" id="L91">                error = null</span>
+            )
+<span class="fc" id="L93">            return</span>
+        }
+<span class="fc" id="L95">        _uiState.value = s.copy(isSubmitting = true, error = null)</span>
+
+<span class="fc" id="L97">        viewModelScope.launch {</span>
+            // Resolve team member id from cached preferences by name
+            val sNow = _uiState.value
+            val list = preferencesManager.getTeamMembers().first()
+            val teamMemberId = list.firstOrNull { it.name == sNow.name }?.id ?: 0
+            val standupDate = DateFormatter.getCurrentDateString()
+            val request = uiMapper.toRequest(
+                state = sNow,
+                standupDate = standupDate,
+                teamMemberId = teamMemberId,
+                teamId = 1L
+            )
+            val result = submitUseCase(request)
+            when (result) {
+                is NetworkResult.Success -&gt; {
+                    val ts = DateFormatter.getCurrentTimeString()
+                    _uiState.value = _uiState.value.copy(
+                        isSubmitting = false,
+                        submittedAt = ts,
+                        name = _uiState.value.roster.firstOrNull() ?: &quot;&quot;,
+                        yesterday = &quot;&quot;,
+                        today = &quot;&quot;,
+                        blockers = &quot;&quot;,
+                        nameError = false,
+                        yesterdayError = false,
+                        todayError = false,
+                        error = null
+                    )
+                    _events.send(SubmitStandupUiEvent.Submitted)
+                    onSuccess(ts)
+                }
+                is NetworkResult.Error -&gt; {
+                    val errorMessage =  result.message ?: &quot;Submission failed&quot;
+                    _uiState.value = _uiState.value.copy(isSubmitting = false, error = errorMessage)
+                    _events.send(SubmitStandupUiEvent.ApiError(errorMessage))
+                }
+            }
+        }
+<span class="fc" id="L135">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

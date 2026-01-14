@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SplashScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.splash</a> &gt; <span class="el_source">SplashScreen.kt</span></div><h1>SplashScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.splash
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.style.TextAlign
+import com.example.logger.R
+import com.example.logger.ui.theme.LoggerTheme
+
+@Composable
+fun SplashScreen(
+    onGetStarted: () -&gt; Unit,
+    onConfigureSettings: () -&gt; Unit,
+<span class="pc bpc" id="L34" title="4 of 14 branches missed.">) {</span>
+<span class="fc" id="L35">    Column(</span>
+<span class="fc" id="L36">        modifier = Modifier.fillMaxSize().padding(24.dp),</span>
+<span class="fc" id="L37">        horizontalAlignment = Alignment.CenterHorizontally,</span>
+<span class="fc" id="L38">        verticalArrangement = Arrangement.Center</span>
+    ) {
+<span class="fc" id="L40">        Text(&quot;📊&quot;, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)</span>
+<span class="fc" id="L41">        Spacer(Modifier.size(24.dp))</span>
+<span class="fc" id="L42">        Text(</span>
+<span class="fc" id="L43">            text = stringResource(id = R.string.splash_title),</span>
+<span class="fc" id="L44">            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.W500),</span>
+<span class="fc" id="L45">            color = MaterialTheme.colorScheme.primary,</span>
+<span class="fc" id="L46">            textAlign = TextAlign.Center</span>
+        )
+<span class="fc" id="L48">        Spacer(Modifier.size(12.dp))</span>
+<span class="fc" id="L49">        Text(</span>
+<span class="fc" id="L50">            text = stringResource(id = R.string.splash_subtitle),</span>
+<span class="fc" id="L51">            style = MaterialTheme.typography.bodyMedium,</span>
+<span class="fc" id="L52">            color = Color(0xFF666666),</span>
+<span class="fc" id="L53">            textAlign = TextAlign.Center</span>
+        )
+<span class="fc" id="L55">        Spacer(Modifier.size(48.dp))</span>
+<span class="fc" id="L56">        Column(</span>
+<span class="fc" id="L57">            modifier = Modifier</span>
+<span class="fc" id="L58">                .padding(horizontal = 12.dp)</span>
+<span class="fc" id="L59">                .widthIn(max = 280.dp)</span>
+        ) {
+<span class="fc" id="L61">            Button(onClick = onGetStarted, modifier = Modifier.fillMaxWidth()) {</span>
+                Icon(Icons.Outlined.Dashboard, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(id = R.string.splash_get_started))
+            }
+<span class="fc" id="L66">            Spacer(Modifier.size(12.dp))</span>
+<span class="fc" id="L67">            Button(onClick = onConfigureSettings, modifier = Modifier.fillMaxWidth()) {</span>
+                Icon(Icons.Outlined.Settings, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(id = R.string.splash_configure_settings))
+            }
+<span class="fc" id="L72">        }</span>
+<span class="fc" id="L73">    }</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">}</span>
+
+@Preview(showBackground = true)
+@Composable
+<span class="nc bnc" id="L78" title="All 6 branches missed.">private fun SplashPreview() {</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">    LoggerTheme {</span>
+        SplashScreen(onGetStarted = {}, onConfigureSettings = {})
+    }
+<span class="nc bnc" id="L82" title="All 2 branches missed.">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

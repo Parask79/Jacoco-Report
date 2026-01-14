@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HomeScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.home</a> &gt; <span class="el_source">HomeScreen.kt</span></div><h1>HomeScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.home
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.PersonOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.logger.domain.model.Standup
+import com.example.logger.presentation.home.components.TeamMoodCard
+import com.example.logger.ui.theme.LoggerTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeRoute(
+    viewModel: HomeViewModel,
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    refreshToken: String? = null,</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    onViewMissing: () -&gt; Unit = {},</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    onSubmit: () -&gt; Unit = {},</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">    onExport: () -&gt; Unit = {},</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    onNavigateExport: () -&gt; Unit = {},</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    onViewRoster: () -&gt; Unit = {},</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    onNavigateToSentimentAnalysis: (() -&gt; Unit)? = null,</span>
+<span class="pc bpc" id="L69" title="31 of 48 branches missed.">) {</span>
+<span class="fc" id="L70">    val state by viewModel.uiState.collectAsState()</span>
+
+    // Refresh data when refresh token changes (triggered by navigation with timestamp)
+    // Using refreshToken instead of boolean ensures this triggers every time we want to refresh
+    // On first load, ViewModel's init block handles the data loading via fetchTeamMembers() -&gt; load()
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    LaunchedEffect(refreshToken) {</span>
+        if (refreshToken != null) {
+            viewModel.load()
+        }
+    }
+
+
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    Scaffold(</span>
+        topBar = {
+            androidx.compose.material3.TopAppBar(
+                title = { Text(&quot;Dashboard&quot;) },
+//                actions = {
+//                    IconButton(onClick = { /* TODO: navigate to settings */ }) {
+//                        Icon(Icons.Outlined.Settings, contentDescription = &quot;Settings&quot;)
+//                    }
+//                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF6200EA),
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White,
+                    navigationIconContentColor = Color.White
+                )
+            )
+        }
+<span class="fc" id="L99">    ) { padding -&gt;</span>
+        Box(Modifier.padding(padding)) {
+            HomeScreen(
+                state = state,
+                onRetry = { viewModel.load() },
+                onViewMissing = onViewMissing,
+                onSubmit = onSubmit,
+                onExport = onNavigateExport,
+                onLoadMore = { viewModel.loadMore() },
+                onViewRoster = onViewRoster,
+                onNavigateToSentimentAnalysis = onNavigateToSentimentAnalysis
+            )
+        }
+    }
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">}</span>
+
+@Composable
+fun HomeScreen(
+    state: HomeUiState,
+    onRetry: () -&gt; Unit,
+    onViewMissing: () -&gt; Unit,
+    onSubmit: () -&gt; Unit,
+    onExport: () -&gt; Unit,
+    onLoadMore: () -&gt; Unit,
+    onViewRoster: () -&gt; Unit,
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    onNavigateToSentimentAnalysis: (() -&gt; Unit)? = null,</span>
+<span class="pc bpc" id="L125" title="10 of 54 branches missed.">) {</span>
+<span class="fc" id="L126">    when {</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        state.isLoading -&gt; Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {</span>
+<span class="fc" id="L128">            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = &quot;Progress indicator&quot; })</span>
+<span class="fc" id="L129">        }</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        state.error != null -&gt; Column(</span>
+<span class="fc" id="L131">            modifier = Modifier.fillMaxSize(),</span>
+<span class="fc" id="L132">            verticalArrangement = Arrangement.Center,</span>
+<span class="fc" id="L133">            horizontalAlignment = Alignment.CenterHorizontally</span>
+        ) {
+<span class="fc" id="L135">            Text(</span>
+<span class="fc" id="L136">                text = state.error,</span>
+<span class="fc" id="L137">                style = MaterialTheme.typography.bodyLarge,</span>
+<span class="fc" id="L138">                textAlign = TextAlign.Center,</span>
+<span class="fc" id="L139">                modifier = Modifier.padding(16.dp)</span>
+            )
+<span class="fc" id="L141">            Button(onClick = onRetry) { Text(&quot;Retry&quot;) }</span>
+<span class="fc" id="L142">        }</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        else -&gt; {</span>
+<span class="fc" id="L144">            val listState = rememberLazyListState()</span>
+
+            // Detect when user reaches the end of the list
+            // Use canLoadMore as a key to restart effect when pagination state changes
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            LaunchedEffect(listState, state.canLoadMore) {</span>
+                snapshotFlow {
+                    val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                    val totalItems = listState.layoutInfo.totalItemsCount
+                    lastVisibleItem?.index == totalItems - 1 &amp;&amp; totalItems &gt; 0
+                }
+                .collect { isAtEnd -&gt;
+                    if (isAtEnd &amp;&amp; state.canLoadMore &amp;&amp; !state.isLoadingMore) {
+                        onLoadMore()
+                    }
+                }
+            }
+
+<span class="fc" id="L161">            Box(Modifier.fillMaxSize()) {</span>
+<span class="fc" id="L162">                LazyColumn(</span>
+<span class="fc" id="L163">                    state = listState,</span>
+<span class="fc" id="L164">                    modifier = Modifier.fillMaxSize(),</span>
+<span class="fc" id="L165">                    contentPadding = PaddingValues(16.dp),</span>
+<span class="fc bfc" id="L166" title="All 10 branches covered.">                    verticalArrangement = Arrangement.spacedBy(12.dp)</span>
+<span class="fc" id="L167">                ) {</span>
+<span class="fc" id="L168">                    item {</span>
+                        HeroStatCard(
+                            submitted = state.totalEntries, // Use totalEntries from API, not submissions.size
+                            total = state.roster.size,
+                            lastUpdated = state.lastUpdated
+                        )
+                    }
+
+<span class="fc" id="L176">                    item {</span>
+                        TeamMoodCard(
+                            sentimentSummary = state.sentimentSummary,
+                            isLoading = state.isSentimentLoading,
+                            error = state.sentimentError,
+                            onNavigateToSentimentAnalysis = onNavigateToSentimentAnalysis
+                        )
+                    }
+
+<span class="fc bfc" id="L185" title="All 2 branches covered.">                    if (state.pendingCount &gt; 0) {</span>
+<span class="fc" id="L186">                        item {</span>
+                            PendingBar(count = state.pendingCount, onViewMissing = onViewMissing)
+                        }
+                    }
+
+<span class="fc bfc" id="L191" title="All 2 branches covered.">                    if (state.submissions.isEmpty()) {</span>
+<span class="fc" id="L192">                        item {</span>
+                            EmptyState(onSubmit = onSubmit, onViewRoster = onViewRoster)
+                        }
+                    } else {
+<span class="fc" id="L196">                        item {</span>
+                            RowHeader(onExport = onExport)
+                        }
+
+<span class="fc" id="L200">                        items(state.submissions) { s -&gt;</span>
+                            SubmissionCard(s)
+                        }
+                    }
+
+                    // Loading indicator at the bottom when loading more
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                    if (state.isLoadingMore) {</span>
+<span class="nc" id="L207">                        item {</span>
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+<span class="fc" id="L219">                    item { Spacer(Modifier.height(96.dp)) }</span>
+<span class="fc" id="L220">                }</span>
+<span class="fc" id="L221">            }</span>
+        }
+    }
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L227" title="10 of 18 branches missed.">private fun HeroStatCard(submitted: Int, total: Int, lastUpdated: String) {</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">    ElevatedCard(</span>
+<span class="fc" id="L229">        modifier = Modifier.fillMaxWidth(),</span>
+<span class="fc" id="L230">        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)</span>
+<span class="fc" id="L231">    ) {</span>
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF6200EA), Color(0xFF7C3AED))
+                    )
+                )
+                .padding(24.dp)
+        ) {
+            Column(Modifier.fillMaxWidth()) {
+                Text(
+                    text = &quot;$submitted/$total&quot;,
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White
+                )
+                Text(
+                    text = &quot;Standups submitted today&quot;,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = &quot;Last updated $lastUpdated&quot;,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+            }
+        }
+    }
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L265" title="8 of 14 branches missed.">private fun PendingBar(count: Int, onViewMissing: () -&gt; Unit) {</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">    Card(</span>
+<span class="fc" id="L267">        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),</span>
+<span class="fc" id="L268">        modifier = Modifier.fillMaxWidth()</span>
+<span class="fc" id="L269">    ) {</span>
+        Column(Modifier.padding(16.dp)) {
+            androidx.compose.foundation.layout.Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.PersonOff,
+                    contentDescription = null,
+                    tint = Color(0xFFE65100)
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = &quot;$count team member${if (count == 1) &quot;&quot; else &quot;s&quot;} missing&quot;,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color(0xFFE65100)
+                    )
+                    Text(
+                        text = &quot;Haven't submitted standup yet&quot;,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF666666)
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = onViewMissing,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE65100),
+                    contentColor = Color.White
+                )
+            ) {
+                Icon(Icons.Outlined.NotificationsActive, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(&quot;View Missing Standups&quot;)
+            }
+        }
+    }
+<span class="pc bfc" id="L309" title="All 2 branches covered.">}</span>
+
+@Composable
+<span class="pc bpc" id="L312" title="6 of 10 branches missed.">private fun RowHeader(onExport: () -&gt; Unit) {</span>
+<span class="fc" id="L313">    Box(</span>
+<span class="fc" id="L314">        modifier = Modifier</span>
+<span class="fc" id="L315">            .fillMaxWidth()</span>
+<span class="fc" id="L316">            .padding(top = 8.dp, bottom = 4.dp)</span>
+    ) {
+<span class="fc" id="L318">        Text(</span>
+<span class="fc" id="L319">            text = &quot;Today's Standups&quot;,</span>
+<span class="fc" id="L320">            style = MaterialTheme.typography.titleLarge,</span>
+<span class="fc" id="L321">            modifier = Modifier.align(Alignment.CenterStart)</span>
+        )
+<span class="fc" id="L323">        Button(onClick = onExport, modifier = Modifier.align(Alignment.CenterEnd)) {</span>
+            Icon(Icons.Outlined.Download, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(&quot;Export&quot;)
+        }
+<span class="fc" id="L328">    }</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L332" title="6 of 10 branches missed.">private fun SubmissionCard(s: Standup) {</span>
+<span class="fc bfc" id="L333" title="All 6 branches covered.">    val hasBlocker = (s.blockers ?: &quot;&quot;).trim().isNotEmpty() &amp;&amp;</span>
+<span class="pc bpc" id="L334" title="2 of 4 branches missed.">                     (s.blockers ?: &quot;&quot;).lowercase() != &quot;none&quot;</span>
+
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">    ElevatedCard(</span>
+<span class="fc" id="L337">        modifier = Modifier.fillMaxWidth(),</span>
+<span class="fc" id="L338">        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)</span>
+<span class="fc" id="L339">    ) {</span>
+        androidx.compose.foundation.layout.Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
+            // Red vertical bar for blockers
+            if (hasBlocker) {
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.error)
+                )
+            }
+
+            Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                Column(Modifier.fillMaxWidth()) {
+                    RowHeaderAvatar(name = s.name, time = s.time, hasBlocker = hasBlocker)
+                }
+                Spacer(Modifier.height(12.dp))
+                LabeledSection(label = &quot;YESTERDAY&quot;, text = s.yesterday)
+                Spacer(Modifier.height(8.dp))
+                LabeledSection(label = &quot;TODAY&quot;, text = s.today)
+                if (hasBlocker) {
+                    Spacer(Modifier.height(8.dp))
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = &quot;⚠ BLOCKERS&quot;,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Text(
+                                text = s.blockers ?: &quot;&quot;,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L385" title="14 of 26 branches missed.">private fun RowHeaderAvatar(name: String, time: String, hasBlocker: Boolean = false) {</span>
+<span class="fc" id="L386">    androidx.compose.foundation.layout.Row(</span>
+<span class="fc" id="L387">        verticalAlignment = Alignment.CenterVertically,</span>
+<span class="fc" id="L388">        modifier = Modifier.fillMaxWidth()</span>
+    ) {
+<span class="pc bpc" id="L390" title="1 of 2 branches missed.">        val initials = name.split(&quot; &quot;).mapNotNull { it.firstOrNull()?.toString() }.take(2).joinToString(&quot;&quot;)</span>
+
+<span class="fc" id="L392">        Surface(</span>
+<span class="fc" id="L393">            shape = CircleShape,</span>
+<span class="fc" id="L394">            color = MaterialTheme.colorScheme.secondaryContainer,</span>
+<span class="fc" id="L395">            modifier = Modifier.size(40.dp)</span>
+<span class="fc" id="L396">        ) {</span>
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = initials,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+
+<span class="fc" id="L405">        Spacer(Modifier.width(12.dp))</span>
+
+<span class="fc" id="L407">        Column(Modifier.weight(1f)) {</span>
+<span class="fc" id="L408">            androidx.compose.foundation.layout.Row(verticalAlignment = Alignment.CenterVertically) {</span>
+<span class="fc" id="L409">                Text(name, style = MaterialTheme.typography.titleMedium)</span>
+
+<span class="fc bfc" id="L411" title="All 2 branches covered.">                if (hasBlocker) {</span>
+<span class="fc" id="L412">                    Spacer(Modifier.width(8.dp))</span>
+<span class="fc" id="L413">                    Surface(</span>
+<span class="fc" id="L414">                        shape = CircleShape,</span>
+<span class="fc" id="L415">                        color = MaterialTheme.colorScheme.errorContainer</span>
+                    ) {
+                        Text(
+                            text = &quot;⚠ HAS BLOCKER&quot;,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(
+                                horizontal = 8.dp,
+                                vertical = 2.dp
+                            )
+                        )
+                    }
+                }
+<span class="fc" id="L428">            }</span>
+
+<span class="fc" id="L430">            Text(</span>
+<span class="fc" id="L431">                &quot;Submitted at $time&quot;,</span>
+<span class="fc" id="L432">                style = MaterialTheme.typography.bodySmall,</span>
+<span class="fc" id="L433">                color = MaterialTheme.colorScheme.onSurfaceVariant</span>
+            )
+<span class="fc" id="L435">        }</span>
+<span class="fc" id="L436">    }</span>
+<span class="pc bpc" id="L437" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L440" title="17 of 26 branches missed.">private fun LabeledSection(label: String, text: String, highlight: Boolean = false) {</span>
+<span class="fc" id="L441">    Text(label, style = MaterialTheme.typography.labelSmall, color = Color(0xFF666666))</span>
+<span class="pc bpc" id="L442" title="1 of 2 branches missed.">    Text(</span>
+<span class="fc" id="L443">        text = text,</span>
+<span class="fc" id="L444">        style = MaterialTheme.typography.bodyMedium,</span>
+<span class="pc bpc" id="L445" title="1 of 2 branches missed.">        color = if (highlight) Color(0xFFD32F2F) else MaterialTheme.colorScheme.onSurface</span>
+    )
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">}</span>
+
+@Composable
+<span class="pc bpc" id="L450" title="6 of 10 branches missed.">private fun EmptyState(onSubmit: () -&gt; Unit, onViewRoster: () -&gt; Unit) {</span>
+<span class="fc" id="L451">    Column(</span>
+<span class="fc" id="L452">        modifier = Modifier</span>
+<span class="fc" id="L453">            .fillMaxWidth()</span>
+<span class="fc" id="L454">            .padding(vertical = 64.dp, horizontal = 24.dp),</span>
+<span class="fc" id="L455">        horizontalAlignment = Alignment.CenterHorizontally</span>
+    ) {
+<span class="fc" id="L457">        Text(</span>
+<span class="fc" id="L458">            text = &quot;📭&quot;,</span>
+<span class="fc" id="L459">            style = MaterialTheme.typography.displayLarge,</span>
+<span class="fc" id="L460">            fontSize = 80.sp</span>
+
+
+
+        )
+<span class="fc" id="L465">        Spacer(Modifier.height(24.dp))</span>
+<span class="fc" id="L466">        Text(</span>
+<span class="fc" id="L467">            text = &quot;No Standups Yet&quot;,</span>
+<span class="fc" id="L468">            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),</span>
+<span class="fc" id="L469">            color = MaterialTheme.colorScheme.onSurface</span>
+        )
+<span class="fc" id="L471">        Spacer(Modifier.height(12.dp))</span>
+<span class="fc" id="L472">        Text(</span>
+<span class="fc" id="L473">            text = &quot;Start by submitting your first daily standup or add team members.&quot;,</span>
+<span class="fc" id="L474">            style = MaterialTheme.typography.bodyMedium,</span>
+<span class="fc" id="L475">            color = Color(0xFF666666),</span>
+<span class="fc" id="L476">            textAlign = TextAlign.Center,</span>
+<span class="fc" id="L477">            modifier = Modifier.padding(horizontal = 16.dp)</span>
+        )
+<span class="fc" id="L479">        Spacer(Modifier.height(32.dp))</span>
+<span class="fc" id="L480">        Column(</span>
+<span class="fc" id="L481">            modifier = Modifier.fillMaxWidth(0.85f),</span>
+<span class="fc" id="L482">            verticalArrangement = Arrangement.spacedBy(12.dp)</span>
+        ) {
+<span class="fc" id="L484">            Button(</span>
+<span class="fc" id="L485">                onClick = onSubmit,</span>
+<span class="fc" id="L486">                modifier = Modifier.fillMaxWidth(),</span>
+<span class="fc" id="L487">                colors = ButtonDefaults.buttonColors(</span>
+<span class="fc" id="L488">                    containerColor = MaterialTheme.colorScheme.primary</span>
+                )
+            ) {
+                Icon(Icons.Outlined.Add, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(&quot;Submit First Standup&quot;)
+            }
+
+<span class="fc" id="L496">        }</span>
+<span class="fc" id="L497">    }</span>
+<span class="pc bpc" id="L498" title="1 of 2 branches missed.">}</span>
+
+// Previews
+@Preview(showBackground = true, name = &quot;Dashboard - Loading&quot;)
+@Composable
+<span class="nc bnc" id="L503" title="All 6 branches missed.">private fun PreviewDashboardLoading() {</span>
+<span class="nc bnc" id="L504" title="All 2 branches missed.">    LoggerTheme {</span>
+        HomeScreen(
+            state = HomeUiState(isLoading = true),
+            onRetry = {},
+            onViewMissing = {},
+            onSubmit = {},
+            onExport = {},
+            onLoadMore = {},
+            onViewRoster = {},
+        )
+    }
+<span class="nc bnc" id="L515" title="All 2 branches missed.">}</span>
+
+@Preview(showBackground = true, name = &quot;Dashboard - Error&quot;)
+@Composable
+<span class="nc bnc" id="L519" title="All 6 branches missed.">private fun PreviewDashboardError() {</span>
+<span class="nc bnc" id="L520" title="All 2 branches missed.">    LoggerTheme {</span>
+        HomeScreen(
+            state = HomeUiState(isLoading = false, error = &quot;Network error. Please try again.&quot;),
+            onRetry = {},
+            onViewMissing = {},
+            onSubmit = {},
+            onExport = {},
+            onLoadMore = {},
+            onViewRoster = {},
+        )
+    }
+<span class="nc bnc" id="L531" title="All 2 branches missed.">}</span>
+
+@Preview(showBackground = true, name = &quot;Dashboard - Data&quot;)
+@Composable
+<span class="nc bnc" id="L535" title="All 6 branches missed.">private fun PreviewDashboardData() {</span>
+<span class="nc bnc" id="L536" title="All 2 branches missed.">    LoggerTheme {</span>
+        val submissions = listOf(
+            Standup(id = &quot;s1&quot;, name = &quot;Alex Johnson&quot;, yesterday = &quot;Reviewed PRs&quot;, today = &quot;Finalize API spec&quot;, blockers = null, time = &quot;09:10&quot;, editedAt = null),
+            Standup(id = &quot;s2&quot;, name = &quot;Priya Verma&quot;, yesterday = &quot;Auth flow fixes&quot;, today = &quot;Add MFA&quot;, blockers = &quot;Waiting on UX&quot;, time = &quot;09:25&quot;, editedAt = null),
+            Standup(id = &quot;me&quot;, name = &quot;You&quot;, yesterday = &quot;Feature A tests&quot;, today = &quot;Implement Feature B&quot;, blockers = &quot;&quot;, time = &quot;09:55&quot;, editedAt = &quot;10:30&quot;),
+        )
+        val roster = listOf(&quot;Alex Johnson&quot;, &quot;Priya Verma&quot;, &quot;Miguel Santos&quot;, &quot;Sarah Kim&quot;, &quot;You&quot;)
+        val pending = roster.filterNot { name -&gt; submissions.any { it.name == name } }
+        HomeScreen(
+            state = HomeUiState(
+                isLoading = false,
+                error = null,
+                date = &quot;2025-12-22&quot;,
+                roster = roster,
+                submissions = submissions,
+                pending = pending,
+                lastUpdated = &quot;10:45&quot;
+            ),
+            onRetry = {},
+            onViewMissing = {},
+            onSubmit = {},
+            onExport = {},
+            onLoadMore = {},
+            onViewRoster = {},
+        )
+    }
+<span class="nc bnc" id="L562" title="All 2 branches missed.">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExportViewModel.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.export</a> &gt; <span class="el_source">ExportViewModel.kt</span></div><h1>ExportViewModel.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.export
+
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.logger.core.network.NetworkResult
+import com.example.logger.core.util.DateFormatter
+import com.example.logger.domain.model.StandupEntryData
+import com.example.logger.domain.usecase.GetTodayStandupUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+<span class="fc" id="L17">data class ExportUiState(</span>
+<span class="fc" id="L18">    val selectedDate: String = &quot;&quot;,</span>
+<span class="fc" id="L19">    val standupEntries: List&lt;StandupEntryData&gt; = emptyList(),</span>
+<span class="fc" id="L20">    val isLoading: Boolean = false,</span>
+<span class="fc" id="L21">    val isLoadingMore: Boolean = false,</span>
+<span class="fc" id="L22">    val error: String? = null,</span>
+<span class="fc" id="L23">    val currentPage: Int = 0,</span>
+<span class="fc" id="L24">    val pageSize: Int = 100,</span>
+<span class="pc" id="L25">    val totalEntries: Int = 0,</span>
+<span class="pc" id="L26">    val totalPages: Int = 0,</span>
+<span class="fc" id="L27">    val canLoadMore: Boolean = false</span>
+<span class="fc" id="L28">)</span>
+
+@HiltViewModel
+<span class="fc" id="L31">class ExportViewModel @Inject constructor(</span>
+<span class="fc" id="L32">    private val getTodayStandup: GetTodayStandupUseCase</span>
+<span class="fc" id="L33">) : ViewModel() {</span>
+<span class="fc" id="L34">    private val _uiState = MutableStateFlow(ExportUiState())</span>
+<span class="fc" id="L35">    val uiState: StateFlow&lt;ExportUiState&gt; = _uiState</span>
+
+<span class="fc" id="L37">    init {</span>
+        // Initialize with today's date (IST)
+<span class="fc" id="L39">        val today = DateFormatter.getCurrentDateString()</span>
+<span class="fc" id="L40">        _uiState.value = _uiState.value.copy(selectedDate = today)</span>
+<span class="fc" id="L41">        loadStandups(today)</span>
+<span class="fc" id="L42">    }</span>
+
+    fun onDateChange(date: String) {
+<span class="fc" id="L45">        _uiState.value = _uiState.value.copy(selectedDate = date, currentPage = 0)</span>
+<span class="fc" id="L46">        loadStandups(date, resetList = true)</span>
+<span class="fc" id="L47">    }</span>
+
+    fun loadMore() {
+<span class="fc" id="L50">        val currentState = _uiState.value</span>
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">        if (currentState.canLoadMore &amp;&amp; !currentState.isLoadingMore) {</span>
+<span class="fc" id="L52">            _uiState.value = currentState.copy(currentPage = currentState.currentPage + 1)</span>
+<span class="fc" id="L53">            loadStandups(currentState.selectedDate, resetList = false)</span>
+        }
+<span class="fc" id="L55">    }</span>
+
+<span class="fc" id="L57">    private fun loadStandups(date: String, resetList: Boolean = true) {</span>
+<span class="fc" id="L58">        viewModelScope.launch {</span>
+            if (resetList) {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            } else {
+                _uiState.value = _uiState.value.copy(isLoadingMore = true, error = null)
+            }
+
+            val currentState = _uiState.value
+            val result = getTodayStandup(
+                teamId = 1, // Using hardcoded teamId for now
+                page = currentState.currentPage,
+                size = currentState.pageSize,
+                teamMemberId = null,
+                standupDate = date
+            )
+
+            when (result) {
+                is NetworkResult.Success -&gt; {
+                    val data = result.data
+                    val updatedEntries = if (resetList) {
+                        data.items
+                    } else {
+                        currentState.standupEntries + data.items
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        standupEntries = updatedEntries,
+                        isLoading = false,
+                        isLoadingMore = false,
+                        error = null,
+                        currentPage = data.meta.page,
+                        totalEntries = data.meta.totalElements,
+                        totalPages = data.meta.totalPages,
+                        canLoadMore = data.meta.page &lt; data.meta.totalPages - 1
+                    )
+                }
+                is NetworkResult.Error -&gt; {
+                    _uiState.value = _uiState.value.copy(
+                        standupEntries = if (resetList) emptyList() else currentState.standupEntries,
+                        isLoading = false,
+                        isLoadingMore = false,
+                        error = result.message ?: &quot;An error occurred&quot;
+                    )
+                }
+            }
+        }
+<span class="fc" id="L104">    }</span>
+
+
+    fun exportMarkdownToUri(context: Context, uri: Uri, date: String, standups: List&lt;ExportStandupUiModel&gt;): Boolean {
+<span class="fc" id="L108">        return try {</span>
+<span class="fc" id="L109">            val markdown = standupsToMarkdown(date, standups)</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">            context.contentResolver.openOutputStream(uri)?.use { it.write(markdown.toByteArray()) }</span>
+<span class="fc" id="L111">            true</span>
+<span class="fc" id="L112">        } catch (e: Exception) {</span>
+<span class="fc" id="L113">            false</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
