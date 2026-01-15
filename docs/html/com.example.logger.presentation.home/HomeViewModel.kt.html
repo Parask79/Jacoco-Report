@@ -38,122 +38,122 @@ import javax.inject.Inject
 
     private fun fetchTeamMembers() {
 <span class="fc" id="L40">        viewModelScope.launch {</span>
-<span class="fc" id="L41">            getTeamMembers(1, 0, 100, true).collect { result -&gt;</span>
-<span class="pc bpc" id="L42" title="1 of 2 branches missed.">                if (result is NetworkResult.Success) {</span>
-<span class="fc" id="L43">                    val members = result.data</span>
+            getTeamMembers(1, 0, 100, true).collect { result -&gt;
+                if (result is NetworkResult.Success) {
+                    val members = result.data
                     // Store in map for easy lookup
-<span class="fc" id="L45">                    teamMembersMap.clear()</span>
-<span class="fc" id="L46">                    members.forEach { member -&gt;</span>
-<span class="fc" id="L47">                        teamMembersMap[member.id] = member.name</span>
-<span class="fc" id="L48">                    }</span>
-<span class="fc" id="L49">                    _uiState.update { it.copy(roster = members.map { m -&gt; m.name }) }</span>
+                    teamMembersMap.clear()
+                    members.forEach { member -&gt;
+                        teamMembersMap[member.id] = member.name
+                    }
+                    _uiState.update { it.copy(roster = members.map { m -&gt; m.name }) }
                     // Load standup data after team members are fetched
-<span class="fc" id="L51">                    load()</span>
+                    load()
                 }
-<span class="fc" id="L53">            }</span>
-<span class="fc" id="L54">        }</span>
+            }
+        }
 <span class="fc" id="L55">    }</span>
 
 <span class="fc" id="L57">    fun load(resetList: Boolean = true, fetchAllStandups: Boolean = false) {</span>
 <span class="fc" id="L58">        viewModelScope.launch {</span>
             // Only show full loading if team members haven't been loaded yet
-<span class="fc" id="L60">            val showFullLoading = teamMembersMap.isEmpty()</span>
+            val showFullLoading = teamMembersMap.isEmpty()
 
-<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (resetList) {</span>
-<span class="fc" id="L63">                _uiState.update {</span>
-<span class="fc" id="L64">                    it.copy(</span>
-<span class="pc bpc" id="L65" title="1 of 2 branches missed.">                        isLoading = showFullLoading,</span>
-<span class="fc" id="L66">                        error = null,</span>
-<span class="fc" id="L67">                        currentPage = 0</span>
-<span class="fc" id="L68">                    )</span>
+            if (resetList) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = showFullLoading,
+                        error = null,
+                        currentPage = 0
+                    )
                 }
             } else {
-<span class="fc" id="L71">                _uiState.update { it.copy(isLoadingMore = true, error = null) }</span>
+                _uiState.update { it.copy(isLoadingMore = true, error = null) }
             }
 
             // Get today's date in yyyy-MM-dd format (IST)
-<span class="fc" id="L75">            val todayDate = DateFormatter.getCurrentDateString()</span>
-<span class="fc" id="L76">            val currentState = _uiState.value</span>
+            val todayDate = DateFormatter.getCurrentDateString()
+            val currentState = _uiState.value
 
             // If fetchAllStandups is true, use a large size to get all in one call
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">            val pageSize = if (fetchAllStandups) 100 else currentState.pageSize</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">            val page = if (fetchAllStandups) 0 else currentState.currentPage</span>
+            val pageSize = if (fetchAllStandups) 100 else currentState.pageSize
+            val page = if (fetchAllStandups) 0 else currentState.currentPage
 
-<span class="fc" id="L82">            val result = getTodayStandup(</span>
-<span class="fc" id="L83">                teamId = 1, // Using hardcoded teamId for now</span>
-<span class="fc" id="L84">                page = page,</span>
-<span class="fc" id="L85">                size = pageSize,</span>
-<span class="fc" id="L86">                standupDate = todayDate</span>
+            val result = getTodayStandup(
+                teamId = 1, // Using hardcoded teamId for now
+                page = page,
+                size = pageSize,
+                standupDate = todayDate
             )
 
-<span class="fc" id="L89">            when (result) {</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">                is NetworkResult.Success -&gt; {</span>
-<span class="fc" id="L91">                    val data = result.data</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">                    val updatedEntries = if (resetList) {</span>
-<span class="fc" id="L93">                        data.items</span>
+            when (result) {
+                is NetworkResult.Success -&gt; {
+                    val data = result.data
+                    val updatedEntries = if (resetList) {
+                        data.items
                     } else {
-<span class="fc" id="L95">                        currentState.standupEntries + data.items</span>
+                        currentState.standupEntries + data.items
                     }
 
                     // Map StandupEntryData to Standup model for UI
                     // createdAt and updatedAt are already formatted to time strings (HH:mm) in the mapper
                     // Use teamMember.name from API response if available, fallback to teamMembersMap or ID
-<span class="fc" id="L101">                    val mappedSubmissions = updatedEntries.map { entry -&gt;</span>
-<span class="pc bpc" id="L102" title="4 of 6 branches missed.">                        val memberName = entry.teamMember?.name</span>
-<span class="nc" id="L103">                            ?: teamMembersMap[entry.teamMemberId]</span>
-<span class="nc" id="L104">                            ?: &quot;Team Member #${entry.teamMemberId}&quot;</span>
-<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                        val time = entry.createdAt ?: &quot;--:--&quot;</span>
+                    val mappedSubmissions = updatedEntries.map { entry -&gt;
+                        val memberName = entry.teamMember?.name
+                            ?: teamMembersMap[entry.teamMemberId]
+                            ?: &quot;Team Member #${entry.teamMemberId}&quot;
+                        val time = entry.createdAt ?: &quot;--:--&quot;
 
-<span class="fc" id="L107">                        Standup(</span>
-<span class="fc" id="L108">                            id = entry.id.toString(),</span>
-<span class="fc" id="L109">                            name = memberName,</span>
-<span class="fc" id="L110">                            yesterday = entry.yesterdayWork!!,</span>
-<span class="fc" id="L111">                            today = entry.todayPlan!!,</span>
-<span class="fc" id="L112">                            blockers = entry.blockers,</span>
-<span class="fc" id="L113">                            time = time,</span>
-<span class="fc" id="L114">                            editedAt = entry.updatedAt</span>
-<span class="fc" id="L115">                        )</span>
+                        Standup(
+                            id = entry.id.toString(),
+                            name = memberName,
+                            yesterday = entry.yesterdayWork!!,
+                            today = entry.todayPlan!!,
+                            blockers = entry.blockers,
+                            time = time,
+                            editedAt = entry.updatedAt
+                        )
                     }
 
                     // Calculate pending members based on total count, not loaded items
                     // This ensures correct count during pagination
-<span class="fc" id="L120">                    val totalSubmitted = data.meta.totalElements</span>
-<span class="fc" id="L121">                    val totalTeamMembers = teamMembersMap.size</span>
-<span class="fc" id="L122">                    val pendingCount = totalTeamMembers - totalSubmitted</span>
+                    val totalSubmitted = data.meta.totalElements
+                    val totalTeamMembers = teamMembersMap.size
+                    val pendingCount = totalTeamMembers - totalSubmitted
 
                     // For the pending list, calculate based on ALL loaded entries across pagination
                     // This gives us an accurate list of who hasn't submitted based on what we've loaded so far
-<span class="fc" id="L126">                    val submittedMemberIds = updatedEntries.map { it.teamMemberId }.toSet()</span>
-<span class="fc bfc" id="L127" title="All 2 branches covered.">                    val pendingMembers = teamMembersMap.filterKeys { it !in submittedMemberIds }.values.toList()</span>
+                    val submittedMemberIds = updatedEntries.map { it.teamMemberId }.toSet()
+                    val pendingMembers = teamMembersMap.filterKeys { it !in submittedMemberIds }.values.toList()
 
-<span class="fc" id="L129">                    _uiState.update {</span>
-<span class="fc" id="L130">                        it.copy(</span>
-<span class="fc" id="L131">                            isLoading = false,</span>
-<span class="fc" id="L132">                            isLoadingMore = false,</span>
-<span class="fc" id="L133">                            error = null,</span>
-<span class="fc" id="L134">                            date = todayDate,</span>
-<span class="fc" id="L135">                            submissions = mappedSubmissions,</span>
-<span class="fc" id="L136">                            pending = pendingMembers, // Names list (from loaded data)</span>
-<span class="fc" id="L137">                            pendingCount = pendingCount, // Accurate count (from totalElements)</span>
-<span class="fc" id="L138">                            lastUpdated = nowTime(),</span>
-<span class="fc" id="L139">                            standupEntries = updatedEntries,</span>
-<span class="fc" id="L140">                            currentPage = data.meta.page,</span>
-<span class="fc" id="L141">                            totalEntries = data.meta.totalElements,</span>
-<span class="fc" id="L142">                            totalPages = data.meta.totalPages,</span>
-<span class="fc bfc" id="L143" title="All 2 branches covered.">                            canLoadMore = data.meta.page &lt; data.meta.totalPages - 1</span>
-<span class="fc" id="L144">                        )</span>
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoadingMore = false,
+                            error = null,
+                            date = todayDate,
+                            submissions = mappedSubmissions,
+                            pending = pendingMembers, // Names list (from loaded data)
+                            pendingCount = pendingCount, // Accurate count (from totalElements)
+                            lastUpdated = nowTime(),
+                            standupEntries = updatedEntries,
+                            currentPage = data.meta.page,
+                            totalEntries = data.meta.totalElements,
+                            totalPages = data.meta.totalPages,
+                            canLoadMore = data.meta.page &lt; data.meta.totalPages - 1
+                        )
                     }
                 }
 
-<span class="fc" id="L148">                is NetworkResult.Error -&gt; _uiState.update {</span>
-<span class="fc" id="L149">                    it.copy(</span>
-<span class="fc" id="L150">                        isLoading = false,</span>
-<span class="fc" id="L151">                        isLoadingMore = false,</span>
-<span class="pc bpc" id="L152" title="1 of 2 branches missed.">                        error = result.message ?: &quot;Unknown error&quot;</span>
-<span class="fc" id="L153">                    )</span>
+                is NetworkResult.Error -&gt; _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isLoadingMore = false,
+                        error = result.message ?: &quot;Unknown error&quot;
+                    )
                 }
             }
-<span class="fc" id="L156">        }</span>
+        }
 <span class="fc" id="L157">    }</span>
 
     fun loadMore() {
@@ -166,39 +166,39 @@ import javax.inject.Inject
 
     private fun loadTeamSentiments() {
 <span class="fc" id="L168">        viewModelScope.launch {</span>
-<span class="fc" id="L169">            _uiState.update { it.copy(isSentimentLoading = true, sentimentError = null) }</span>
+            _uiState.update { it.copy(isSentimentLoading = true, sentimentError = null) }
 
             // Compute 30-day range in IST: from = today - 30 days, to = today
-<span class="fc" id="L172">            val toDate = DateFormatter.getCurrentDateString()</span>
-<span class="fc" id="L173">            val fromDate = DateFormatter.getDateDaysAgoString(30)</span>
+            val toDate = DateFormatter.getCurrentDateString()
+            val fromDate = DateFormatter.getDateDaysAgoString(30)
 
-<span class="fc" id="L175">            getTeamSentiments(</span>
-<span class="fc" id="L176">                teamId = 1, // Using hardcoded teamId for now</span>
-<span class="fc" id="L177">                from = fromDate,</span>
-<span class="fc" id="L178">                to = toDate</span>
-<span class="fc" id="L179">            ).collect { result -&gt;</span>
-<span class="fc" id="L180">                when (result) {</span>
-<span class="fc bfc" id="L181" title="All 2 branches covered.">                    is NetworkResult.Success -&gt; {</span>
-<span class="fc" id="L182">                        val summary = result.data.toSummary()</span>
-<span class="fc" id="L183">                        _uiState.update {</span>
-<span class="fc" id="L184">                            it.copy(</span>
-<span class="fc" id="L185">                                sentimentSummary = summary,</span>
-<span class="fc" id="L186">                                isSentimentLoading = false,</span>
-<span class="fc" id="L187">                                sentimentError = null</span>
-<span class="fc" id="L188">                            )</span>
+            getTeamSentiments(
+                teamId = 1, // Using hardcoded teamId for now
+                from = fromDate,
+                to = toDate
+            ).collect { result -&gt;
+                when (result) {
+                    is NetworkResult.Success -&gt; {
+                        val summary = result.data.toSummary()
+                        _uiState.update {
+                            it.copy(
+                                sentimentSummary = summary,
+                                isSentimentLoading = false,
+                                sentimentError = null
+                            )
                         }
                     }
-<span class="fc" id="L191">                    is NetworkResult.Error -&gt; {</span>
-<span class="fc" id="L192">                        _uiState.update {</span>
-<span class="fc" id="L193">                            it.copy(</span>
-<span class="fc" id="L194">                                isSentimentLoading = false,</span>
-<span class="fc" id="L195">                                sentimentError = result.message</span>
-<span class="fc" id="L196">                            )</span>
+                    is NetworkResult.Error -&gt; {
+                        _uiState.update {
+                            it.copy(
+                                isSentimentLoading = false,
+                                sentimentError = result.message
+                            )
                         }
                     }
                 }
-<span class="fc" id="L200">            }</span>
-<span class="fc" id="L201">        }</span>
+            }
+        }
 <span class="fc" id="L202">    }</span>
 
 <span class="fc" id="L204">    private fun nowTime(): String = DateFormatter.getCurrentTimeString()</span>

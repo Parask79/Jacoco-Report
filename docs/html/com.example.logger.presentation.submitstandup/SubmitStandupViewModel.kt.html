@@ -50,22 +50,22 @@ sealed interface SubmitStandupUiEvent {
         // Fetch team members via use case returning NetworkResult and set roster
 
 <span class="fc" id="L52">        viewModelScope.launch {</span>
-<span class="fc" id="L53">            getTeamMembersUseCase(1, 1, 20).collect { result -&gt;</span>
-<span class="fc" id="L54">                when (result) {</span>
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">                    is com.example.logger.core.network.NetworkResult.Success -&gt; {</span>
-<span class="fc" id="L56">                        val names = result.data.map { it.name }</span>
-<span class="fc" id="L57">                        _uiState.value = _uiState.value.copy(</span>
-<span class="fc" id="L58">                            roster = names,</span>
-<span class="pc bpc" id="L59" title="1 of 6 branches missed.">                            name = if (_uiState.value.name.isBlank() &amp;&amp; names.isNotEmpty()) names.first() else _uiState.value.name</span>
+            getTeamMembersUseCase(1, 1, 20).collect { result -&gt;
+                when (result) {
+                    is com.example.logger.core.network.NetworkResult.Success -&gt; {
+                        val names = result.data.map { it.name }
+                        _uiState.value = _uiState.value.copy(
+                            roster = names,
+                            name = if (_uiState.value.name.isBlank() &amp;&amp; names.isNotEmpty()) names.first() else _uiState.value.name
                         )
                     }
-<span class="nc" id="L62">                    is com.example.logger.core.network.NetworkResult.Error -&gt; {</span>
+                    is com.example.logger.core.network.NetworkResult.Error -&gt; {
                         // Keep existing roster, optionally set error message
-<span class="nc" id="L64">                        _uiState.value = _uiState.value.copy(error = result.message)</span>
+                        _uiState.value = _uiState.value.copy(error = result.message)
                     }
                 }
-<span class="fc" id="L67">            }</span>
-<span class="fc" id="L68">        }</span>
+            }
+        }
 
 <span class="fc" id="L70">    }</span>
 
@@ -96,42 +96,42 @@ sealed interface SubmitStandupUiEvent {
 
 <span class="fc" id="L97">        viewModelScope.launch {</span>
             // Resolve team member id from cached preferences by name
-<span class="fc" id="L99">            val sNow = _uiState.value</span>
-<span class="fc" id="L100">            val list = preferencesManager.getTeamMembers().first()</span>
-<span class="pc bpc" id="L101" title="1 of 2 branches missed.">            val teamMemberId = list.firstOrNull { it.name == sNow.name }?.id ?: 0</span>
-<span class="fc" id="L102">            val standupDate = DateFormatter.getCurrentDateString()</span>
-<span class="fc" id="L103">            val request = uiMapper.toRequest(</span>
-<span class="fc" id="L104">                state = sNow,</span>
-<span class="fc" id="L105">                standupDate = standupDate,</span>
-<span class="fc" id="L106">                teamMemberId = teamMemberId,</span>
-<span class="fc" id="L107">                teamId = 1L</span>
+            val sNow = _uiState.value
+            val list = preferencesManager.getTeamMembers().first()
+            val teamMemberId = list.firstOrNull { it.name == sNow.name }?.id ?: 0
+            val standupDate = DateFormatter.getCurrentDateString()
+            val request = uiMapper.toRequest(
+                state = sNow,
+                standupDate = standupDate,
+                teamMemberId = teamMemberId,
+                teamId = 1L
             )
-<span class="fc" id="L109">            val result = submitUseCase(request)</span>
-<span class="fc" id="L110">            when (result) {</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">                is NetworkResult.Success -&gt; {</span>
-<span class="fc" id="L112">                    val ts = DateFormatter.getCurrentTimeString()</span>
-<span class="fc" id="L113">                    _uiState.value = _uiState.value.copy(</span>
-<span class="fc" id="L114">                        isSubmitting = false,</span>
-<span class="fc" id="L115">                        submittedAt = ts,</span>
-<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                        name = _uiState.value.roster.firstOrNull() ?: &quot;&quot;,</span>
-<span class="fc" id="L117">                        yesterday = &quot;&quot;,</span>
-<span class="fc" id="L118">                        today = &quot;&quot;,</span>
-<span class="fc" id="L119">                        blockers = &quot;&quot;,</span>
-<span class="fc" id="L120">                        nameError = false,</span>
-<span class="fc" id="L121">                        yesterdayError = false,</span>
-<span class="fc" id="L122">                        todayError = false,</span>
-<span class="fc" id="L123">                        error = null</span>
+            val result = submitUseCase(request)
+            when (result) {
+                is NetworkResult.Success -&gt; {
+                    val ts = DateFormatter.getCurrentTimeString()
+                    _uiState.value = _uiState.value.copy(
+                        isSubmitting = false,
+                        submittedAt = ts,
+                        name = _uiState.value.roster.firstOrNull() ?: &quot;&quot;,
+                        yesterday = &quot;&quot;,
+                        today = &quot;&quot;,
+                        blockers = &quot;&quot;,
+                        nameError = false,
+                        yesterdayError = false,
+                        todayError = false,
+                        error = null
                     )
-<span class="fc" id="L125">                    _events.send(SubmitStandupUiEvent.Submitted)</span>
-<span class="fc" id="L126">                    onSuccess(ts)</span>
+                    _events.send(SubmitStandupUiEvent.Submitted)
+                    onSuccess(ts)
                 }
-<span class="fc" id="L128">                is NetworkResult.Error -&gt; {</span>
-<span class="pc bpc" id="L129" title="1 of 2 branches missed.">                    val errorMessage =  result.message ?: &quot;Submission failed&quot;</span>
-<span class="fc" id="L130">                    _uiState.value = _uiState.value.copy(isSubmitting = false, error = errorMessage)</span>
-<span class="fc" id="L131">                    _events.send(SubmitStandupUiEvent.ApiError(errorMessage))</span>
+                is NetworkResult.Error -&gt; {
+                    val errorMessage =  result.message ?: &quot;Submission failed&quot;
+                    _uiState.value = _uiState.value.copy(isSubmitting = false, error = errorMessage)
+                    _events.send(SubmitStandupUiEvent.ApiError(errorMessage))
                 }
             }
-<span class="fc" id="L134">        }</span>
+        }
 <span class="fc" id="L135">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
