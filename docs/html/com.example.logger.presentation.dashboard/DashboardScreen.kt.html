@@ -23,9 +23,9 @@ fun DashboardScreen(
 <span class="pc bpc" id="L23" title="1 of 2 branches missed.">    onNavigateSettings: () -&gt; Unit = {},</span>
 <span class="pc bpc" id="L24" title="1 of 2 branches missed.">    onNavigateMissing: () -&gt; Unit = {},</span>
 <span class="pc bpc" id="L25" title="1 of 2 branches missed.">    onNavigateExport: () -&gt; Unit = {},</span>
-<span class="pc bpc" id="L26" title="1 of 2 branches missed.">    onNavigateRoster: () -&gt; Unit = {},</span>
+<span class="pc bfc" id="L26" title="All 2 branches covered.">    onNavigateRoster: () -&gt; Unit = {},</span>
 <span class="pc bpc" id="L27" title="3 of 4 branches missed.">    onNavigateSentiment: (pos: Int, neu: Int, neg: Int, total: Int) -&gt; Unit = { _, _, _, _ -&gt; },</span>
-<span class="pc bpc" id="L28" title="31 of 52 branches missed.">) {</span>
+<span class="pc bpc" id="L28" title="22 of 52 branches missed.">) {</span>
     // Body-only Home content, RootScaffold provides FAB and bottom bar
 <span class="fc" id="L30">    val vm: HomeViewModel = viewModel</span>
 <span class="pc bpc" id="L31" title="1 of 2 branches missed.">    HomeRoute(</span>
@@ -35,7 +35,7 @@ fun DashboardScreen(
 <span class="fc" id="L35">        onSubmit = onNavigateSubmit,</span>
 <span class="fc" id="L36">        onExport = onNavigateExport,</span>
 <span class="fc" id="L37">        onNavigateExport = onNavigateExport,</span>
-<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        onViewRoster = onNavigateRoster,</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        onViewRoster = onNavigateRoster,</span>
 <span class="fc" id="L39">        onNavigateToSentimentAnalysis = {</span>
 <span class="nc" id="L40">            val summary = vm.uiState.value.sentimentSummary</span>
 <span class="nc" id="L41">            onNavigateSentiment(</span>

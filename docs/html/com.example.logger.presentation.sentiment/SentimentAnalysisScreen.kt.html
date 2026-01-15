@@ -43,11 +43,10 @@ fun SentimentAnalysisScreen(
     pos: Int,
     neu: Int,
     neg: Int,
-    total: Int,
     onNavigateBack: () -&gt; Unit
-<span class="nc bnc" id="L48" title="All 22 branches missed.">) {</span>
-<span class="nc bnc" id="L49" title="All 2 branches missed.">    Scaffold(</span>
-<span class="nc" id="L50">        topBar = {</span>
+<span class="pc bpc" id="L47" title="12 of 22 branches missed.">) {</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">    Scaffold(</span>
+<span class="fc" id="L49">        topBar = {</span>
             TopAppBar(
                 title = { Text(&quot;Sentiment Analysis&quot;, color = MaterialTheme.colorScheme.onPrimary) },
                 navigationIcon = {
@@ -62,7 +61,7 @@ fun SentimentAnalysisScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
             )
         }
-<span class="nc" id="L65">    ) { padding -&gt;</span>
+<span class="fc" id="L64">    ) { padding -&gt;</span>
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -93,102 +92,98 @@ fun SentimentAnalysisScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     LegendRow(pos = pos, neu = neu, neg = neg)
-
-//                    val insight = when {
-//                        total == 0 -&gt; &quot;No sentiment data available&quot;
-//                        pos - neg &gt; total * 0.3 -&gt; &quot;Very Positive mood&quot;
-//                        pos - neg &gt; 0 -&gt; &quot;Positive mood&quot;
-//                        neg - pos &gt; total * 0.3 -&gt; &quot;Needs attention&quot;
-//                        else -&gt; &quot;Neutral mood&quot;
-//                    }
-//
-//                    Text(
-//                        text = &quot;Based on $total submissions. $insight.&quot;,
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant
-//                    )
                 }
             }
         }
     }
-<span class="nc bnc" id="L114" title="All 2 branches missed.">}</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">}</span>
 
 @Composable
 private fun PieChart(
     positive: Int,
     neutral: Int,
     negative: Int,
-<span class="nc bnc" id="L121" title="All 2 branches missed.">    modifier: Modifier = Modifier</span>
-<span class="nc bnc" id="L122" title="All 30 branches missed.">) {</span>
-<span class="nc" id="L123">    val total = (positive + neutral + negative).coerceAtLeast(1)</span>
-<span class="nc" id="L124">    val posAngle = 360f * (positive / total.toFloat())</span>
-<span class="nc" id="L125">    val neuAngle = 360f * (neutral / total.toFloat())</span>
-<span class="nc" id="L126">    val negAngle = 360f * (negative / total.toFloat())</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    modifier: Modifier = Modifier</span>
+<span class="pc bpc" id="L107" title="10 of 30 branches missed.">) {</span>
+<span class="fc" id="L108">    val total = (positive + neutral + negative).coerceAtLeast(1)</span>
+<span class="fc" id="L109">    val posAngle = 360f * (positive / total.toFloat())</span>
+<span class="fc" id="L110">    val neuAngle = 360f * (neutral / total.toFloat())</span>
+<span class="fc" id="L111">    val negAngle = 360f * (negative / total.toFloat())</span>
 
-<span class="nc" id="L128">    Box(modifier = modifier, contentAlignment = Alignment.Center) {</span>
-<span class="nc" id="L129">        Canvas(modifier = Modifier.fillMaxSize()) {</span>
-<span class="nc" id="L130">            val diameter = size.minDimension</span>
-<span class="nc" id="L131">            val left = (size.width - diameter) / 2f</span>
-<span class="nc" id="L132">            val top = (size.height - diameter) / 2f</span>
-<span class="nc" id="L133">            val chartSize = Size(diameter, diameter)</span>
-<span class="nc" id="L134">            var startAngle = -90f</span>
+<span class="fc" id="L113">    Box(modifier = modifier, contentAlignment = Alignment.Center) {</span>
+<span class="fc" id="L114">        Canvas(modifier = Modifier.fillMaxSize()) {</span>
+<span class="fc" id="L115">            val diameter = size.minDimension</span>
+<span class="fc" id="L116">            val left = (size.width - diameter) / 2f</span>
+<span class="fc" id="L117">            val top = (size.height - diameter) / 2f</span>
+<span class="fc" id="L118">            val chartSize = Size(diameter, diameter)</span>
+<span class="fc" id="L119">            var startAngle = -90f</span>
 
             // Positive - Green
-<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (posAngle &gt; 0f) {</span>
-<span class="nc" id="L138">                drawArc(</span>
-<span class="nc" id="L139">                    color = Color(0xFF4CAF50),</span>
-<span class="nc" id="L140">                    startAngle = startAngle,</span>
-<span class="nc" id="L141">                    sweepAngle = posAngle,</span>
-<span class="nc" id="L142">                    useCenter = true,</span>
-<span class="nc" id="L143">                    topLeft = Offset(left, top),</span>
-<span class="nc" id="L144">                    size = chartSize</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (posAngle &gt; 0f) {</span>
+<span class="fc" id="L123">                drawArc(</span>
+<span class="fc" id="L124">                    color = Color(0xFF4CAF50),</span>
+<span class="fc" id="L125">                    startAngle = startAngle,</span>
+<span class="fc" id="L126">                    sweepAngle = posAngle,</span>
+<span class="fc" id="L127">                    useCenter = true,</span>
+<span class="fc" id="L128">                    topLeft = Offset(left, top),</span>
+<span class="fc" id="L129">                    size = chartSize</span>
                 )
             }
-<span class="nc" id="L147">            startAngle += posAngle</span>
+<span class="fc" id="L132">            startAngle += posAngle</span>
 
             // Neutral - Amber
-<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (neuAngle &gt; 0f) {</span>
-<span class="nc" id="L151">                drawArc(</span>
-<span class="nc" id="L152">                    color = Color(0xFFFFC107),</span>
-<span class="nc" id="L153">                    startAngle = startAngle,</span>
-<span class="nc" id="L154">                    sweepAngle = neuAngle,</span>
-<span class="nc" id="L155">                    useCenter = true,</span>
-<span class="nc" id="L156">                    topLeft = Offset(left, top),</span>
-<span class="nc" id="L157">                    size = chartSize</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">            if (neuAngle &gt; 0f) {</span>
+<span class="fc" id="L136">                drawArc(</span>
+<span class="fc" id="L137">                    color = Color(0xFFFFC107),</span>
+<span class="fc" id="L138">                    startAngle = startAngle,</span>
+<span class="fc" id="L139">                    sweepAngle = neuAngle,</span>
+<span class="fc" id="L140">                    useCenter = true,</span>
+<span class="fc" id="L141">                    topLeft = Offset(left, top),</span>
+<span class="fc" id="L142">                    size = chartSize</span>
                 )
             }
-<span class="nc" id="L160">            startAngle += neuAngle</span>
+<span class="fc" id="L145">            startAngle += neuAngle</span>
 
             // Negative - Red
-<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (negAngle &gt; 0f) {</span>
-<span class="nc" id="L164">                drawArc(</span>
-<span class="nc" id="L165">                    color = Color(0xFFF44336),</span>
-<span class="nc" id="L166">                    startAngle = startAngle,</span>
-<span class="nc" id="L167">                    sweepAngle = negAngle,</span>
-<span class="nc" id="L168">                    useCenter = true,</span>
-<span class="nc" id="L169">                    topLeft = Offset(left, top),</span>
-<span class="nc" id="L170">                    size = chartSize</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (negAngle &gt; 0f) {</span>
+<span class="fc" id="L149">                drawArc(</span>
+<span class="fc" id="L150">                    color = Color(0xFFF44336),</span>
+<span class="fc" id="L151">                    startAngle = startAngle,</span>
+<span class="fc" id="L152">                    sweepAngle = negAngle,</span>
+<span class="fc" id="L153">                    useCenter = true,</span>
+<span class="fc" id="L154">                    topLeft = Offset(left, top),</span>
+<span class="fc" id="L155">                    size = chartSize</span>
                 )
             }
-<span class="nc" id="L173">        }</span>
-<span class="nc" id="L174">    }</span>
-<span class="nc bnc" id="L175" title="All 2 branches missed.">}</span>
+<span class="fc" id="L158">        }</span>
+<span class="fc" id="L159">    }</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">}</span>
 
 @Composable
-<span class="nc bnc" id="L178" title="All 18 branches missed.">private fun LegendRow(pos: Int, neu: Int, neg: Int) {</span>
-<span class="nc" id="L179">    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {</span>
-<span class="nc" id="L180">        LegendItem(color = Color(0xFF4CAF50), label = &quot;Positive&quot;, count = pos)</span>
-<span class="nc" id="L181">        LegendItem(color = Color(0xFFFFC107), label = &quot;Neutral&quot;, count = neu)</span>
-<span class="nc" id="L182">        LegendItem(color = Color(0xFFF44336), label = &quot;Negative&quot;, count = neg)</span>
-<span class="nc" id="L183">    }</span>
-<span class="nc bnc" id="L184" title="All 2 branches missed.">}</span>
+<span class="pc bpc" id="L163" title="5 of 18 branches missed.">private fun LegendRow(pos: Int, neu: Int, neg: Int) {</span>
+<span class="fc" id="L164">    val total = (pos + neu + neg).coerceAtLeast(1)</span>
+<span class="fc" id="L165">    Row(</span>
+<span class="fc" id="L166">        modifier = Modifier.fillMaxWidth(),</span>
+<span class="fc" id="L167">        horizontalArrangement = Arrangement.SpaceBetween,</span>
+<span class="fc" id="L168">        verticalAlignment = Alignment.CenterVertically</span>
+    ) {
+<span class="fc" id="L170">        LegendItem(color = Color(0xFF4CAF50), label = &quot;Positive&quot;, count = pos, total = total)</span>
+<span class="fc" id="L171">        LegendItem(color = Color(0xFFFFC107), label = &quot;Neutral&quot;, count = neu, total = total)</span>
+<span class="fc" id="L172">        LegendItem(color = Color(0xFFF44336), label = &quot;Negative&quot;, count = neg, total = total)</span>
+<span class="fc" id="L173">    }</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">}</span>
 
 @Composable
-<span class="nc bnc" id="L187" title="All 18 branches missed.">private fun LegendItem(color: Color, label: String, count: Int) {</span>
-<span class="nc" id="L188">    Row(verticalAlignment = Alignment.CenterVertically) {</span>
-<span class="nc" id="L189">        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))</span>
-<span class="nc" id="L190">        Spacer(modifier = Modifier.size(6.dp))</span>
-<span class="nc" id="L191">        Text(text = &quot;$label: $count&quot;, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)</span>
-<span class="nc" id="L192">    }</span>
-<span class="nc bnc" id="L193" title="All 2 branches missed.">}</span>
+<span class="pc bpc" id="L177" title="15 of 22 branches missed.">private fun LegendItem(color: Color, label: String, count: Int, total: Int) {</span>
+<span class="fc" id="L178">    val percentage = ((count / total.toFloat()) * 100).toInt()</span>
+<span class="fc" id="L179">    Row(verticalAlignment = Alignment.CenterVertically) {</span>
+<span class="fc" id="L180">        Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))</span>
+<span class="fc" id="L181">        Spacer(modifier = Modifier.size(6.dp))</span>
+<span class="fc" id="L182">        Text(</span>
+<span class="fc" id="L183">            text = &quot;$label: $count (${percentage}%)&quot;,</span>
+<span class="fc" id="L184">            style = MaterialTheme.typography.bodySmall,</span>
+<span class="fc" id="L185">            color = MaterialTheme.colorScheme.onSurfaceVariant</span>
+        )
+<span class="fc" id="L187">    }</span>
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">}</span>
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

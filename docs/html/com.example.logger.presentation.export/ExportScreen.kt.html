@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExportScreen.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.example.logger.presentation.export</a> &gt; <span class="el_source">ExportScreen.kt</span></div><h1>ExportScreen.kt</h1><pre class="source lang-java linenums">package com.example.logger.presentation.export
 
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -52,79 +51,78 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.logger.R
-import com.example.logger.core.util.DateFormatter
 import java.util.Calendar
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExportScreen(
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    modifier: Modifier = Modifier,</span>
-<span class="nc" id="L63">    viewModel: ExportViewModel = hiltViewModel(),</span>
-<span class="pc bpc" id="L64" title="3 of 4 branches missed.">    onNavigateBack: () -&gt; Unit = {}</span>
-<span class="pc bpc" id="L65" title="20 of 28 branches missed.">) {</span>
-<span class="fc" id="L66">    val uiState by viewModel.uiState.collectAsState()</span>
-<span class="fc" id="L67">    val context = LocalContext.current</span>
-<span class="pc" id="L68">    var showDatePicker by remember { mutableStateOf(false) }</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    modifier: Modifier = Modifier,</span>
+<span class="nc" id="L61">    viewModel: ExportViewModel = hiltViewModel(),</span>
+<span class="pc bpc" id="L62" title="3 of 4 branches missed.">    onNavigateBack: () -&gt; Unit = {}</span>
+<span class="pc bpc" id="L63" title="20 of 28 branches missed.">) {</span>
+<span class="fc" id="L64">    val uiState by viewModel.uiState.collectAsState()</span>
+<span class="fc" id="L65">    val context = LocalContext.current</span>
+<span class="pc" id="L66">    var showDatePicker by remember { mutableStateOf(false) }</span>
 
     // Convert StandupEntryData to ExportStandupUiModel
     // Time is already formatted in IST by the mapper (HH:mm format)
-<span class="fc" id="L72">    val standups = remember(uiState.standupEntries) {</span>
-<span class="fc" id="L73">        uiState.standupEntries.map { entry -&gt;</span>
-<span class="fc" id="L74">            ExportStandupUiModel(</span>
-<span class="pc bpc" id="L75" title="2 of 4 branches missed.">                name = entry.teamMember?.name ?: &quot;Team Member #${entry.teamMemberId}&quot;,</span>
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">                time = entry.createdAt ?: &quot;--:--&quot;,</span>
-<span class="fc" id="L77">                yesterday = entry.yesterdayWork,</span>
-<span class="fc" id="L78">                today = entry.todayPlan,</span>
-<span class="fc" id="L79">                blockers = entry.blockers,</span>
-<span class="fc" id="L80">                editedAt = entry.updatedAt</span>
-<span class="fc" id="L81">            )</span>
-<span class="fc" id="L82">        }</span>
+<span class="fc" id="L70">    val standups = remember(uiState.standupEntries) {</span>
+<span class="fc" id="L71">        uiState.standupEntries.map { entry -&gt;</span>
+<span class="fc" id="L72">            ExportStandupUiModel(</span>
+<span class="fc" id="L73">                name = entry.teamMember.name,</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">                time = entry.createdAt ?: &quot;--:--&quot;,</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">                yesterday = entry.yesterdayWork ?: &quot;N/A&quot;,</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">                today = entry.todayPlan ?: &quot;N/A&quot;,</span>
+<span class="fc" id="L77">                blockers = entry.blockers,</span>
+<span class="fc" id="L78">                editedAt = entry.updatedAt</span>
+<span class="fc" id="L79">            )</span>
+<span class="fc" id="L80">        }</span>
     }
 
-<span class="fc" id="L85">    val createDocumentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(&quot;text/markdown&quot;)) { uri -&gt;</span>
-<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (uri != null) {</span>
-<span class="nc" id="L87">            val success = viewModel.exportMarkdownToUri(context, uri, uiState.selectedDate, standups)</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L89">                Toast.makeText(context, &quot;Exported to file&quot;, Toast.LENGTH_LONG).show()</span>
+<span class="fc" id="L83">    val createDocumentLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(&quot;text/markdown&quot;)) { uri -&gt;</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (uri != null) {</span>
+<span class="nc" id="L85">            val success = viewModel.exportMarkdownToUri(context, uri, uiState.selectedDate, standups)</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (success) {</span>
+<span class="nc" id="L87">                Toast.makeText(context, &quot;Exported to file&quot;, Toast.LENGTH_LONG).show()</span>
             } else {
-<span class="nc" id="L91">                Toast.makeText(context, &quot;Failed to export file&quot;, Toast.LENGTH_LONG).show()</span>
+<span class="nc" id="L89">                Toast.makeText(context, &quot;Failed to export file&quot;, Toast.LENGTH_LONG).show()</span>
             }
         }
-<span class="nc" id="L94">    }</span>
+<span class="nc" id="L92">    }</span>
 
-<span class="fc" id="L96">    Column(</span>
-<span class="fc" id="L97">        modifier</span>
-<span class="fc" id="L98">            .fillMaxSize()</span>
-<span class="fc" id="L99">            .background(MaterialTheme.colorScheme.surface)</span>
+<span class="fc" id="L94">    Column(</span>
+<span class="fc" id="L95">        modifier</span>
+<span class="fc" id="L96">            .fillMaxSize()</span>
+<span class="fc" id="L97">            .background(MaterialTheme.colorScheme.surface)</span>
     ) {
         // Toolbar
-<span class="fc" id="L102">        TopAppBar(</span>
+<span class="fc" id="L100">        TopAppBar(</span>
             title = { Text(stringResource(R.string.export_standups_title)) },
-<span class="fc" id="L104">            navigationIcon = {</span>
+<span class="fc" id="L102">            navigationIcon = {</span>
                 IconButton(onClick = onNavigateBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = &quot;Back&quot;)
                 }
             },
-<span class="fc" id="L109">            colors = TopAppBarDefaults.topAppBarColors(</span>
-<span class="fc" id="L110">                containerColor = Color(0xFF6200EA),</span>
-<span class="fc" id="L111">                titleContentColor = Color.White,</span>
-<span class="fc" id="L112">                navigationIconContentColor = Color.White</span>
+<span class="fc" id="L107">            colors = TopAppBarDefaults.topAppBarColors(</span>
+<span class="fc" id="L108">                containerColor = Color(0xFF6200EA),</span>
+<span class="fc" id="L109">                titleContentColor = Color.White,</span>
+<span class="fc" id="L110">                navigationIconContentColor = Color.White</span>
             )
         )
-<span class="fc" id="L115">        Spacer(Modifier.height(8.dp))</span>
-<span class="fc" id="L116">        Column(Modifier.padding(horizontal = 16.dp)) {</span>
-<span class="fc" id="L117">            Text(</span>
-<span class="fc" id="L118">                text = stringResource(R.string.export_standups_subtitle),</span>
-<span class="fc" id="L119">                style = MaterialTheme.typography.bodyMedium,</span>
-<span class="fc" id="L120">                color = Color(0xFF666666),</span>
-<span class="fc" id="L121">                modifier = Modifier.padding(bottom = 16.dp)</span>
+<span class="fc" id="L113">        Spacer(Modifier.height(8.dp))</span>
+<span class="fc" id="L114">        Column(Modifier.padding(horizontal = 16.dp)) {</span>
+<span class="fc" id="L115">            Text(</span>
+<span class="fc" id="L116">                text = stringResource(R.string.export_standups_subtitle),</span>
+<span class="fc" id="L117">                style = MaterialTheme.typography.bodyMedium,</span>
+<span class="fc" id="L118">                color = Color(0xFF666666),</span>
+<span class="fc" id="L119">                modifier = Modifier.padding(bottom = 16.dp)</span>
             )
-<span class="fc" id="L123">            Card(</span>
-<span class="fc" id="L124">                modifier = Modifier.fillMaxWidth(),</span>
-<span class="fc" id="L125">                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),</span>
-<span class="fc" id="L126">                colors = CardDefaults.cardColors(containerColor = Color.White)</span>
-<span class="fc" id="L127">            ) {</span>
+<span class="fc" id="L121">            Card(</span>
+<span class="fc" id="L122">                modifier = Modifier.fillMaxWidth(),</span>
+<span class="fc" id="L123">                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),</span>
+<span class="fc" id="L124">                colors = CardDefaults.cardColors(containerColor = Color.White)</span>
+<span class="fc" id="L125">            ) {</span>
                 Column(Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.export_select_date),
@@ -208,57 +206,57 @@ fun ExportScreen(
             }
 
             // Loading state
-<span class="pc bpc" id="L211" title="1 of 2 branches missed.">            if (uiState.isLoading) {</span>
-<span class="nc" id="L212">                Box(</span>
-<span class="nc" id="L213">                    modifier = Modifier</span>
-<span class="nc" id="L214">                        .fillMaxWidth()</span>
-<span class="nc" id="L215">                        .padding(vertical = 32.dp),</span>
-<span class="nc" id="L216">                    contentAlignment = Alignment.Center</span>
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">            if (uiState.isLoading) {</span>
+<span class="nc" id="L210">                Box(</span>
+<span class="nc" id="L211">                    modifier = Modifier</span>
+<span class="nc" id="L212">                        .fillMaxWidth()</span>
+<span class="nc" id="L213">                        .padding(vertical = 32.dp),</span>
+<span class="nc" id="L214">                    contentAlignment = Alignment.Center</span>
                 ) {
-<span class="nc" id="L218">                    CircularProgressIndicator()</span>
-<span class="nc" id="L219">                }</span>
-<span class="fc bfc" id="L220" title="All 2 branches covered.">            } else if (uiState.error != null) {</span>
+<span class="nc" id="L216">                    CircularProgressIndicator()</span>
+<span class="nc" id="L217">                }</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">            } else if (uiState.error != null) {</span>
                 // Error state
-<span class="fc" id="L222">                Column(</span>
-<span class="fc" id="L223">                    modifier = Modifier</span>
-<span class="fc" id="L224">                        .fillMaxWidth()</span>
-<span class="fc" id="L225">                        .padding(vertical = 32.dp),</span>
-<span class="fc" id="L226">                    horizontalAlignment = Alignment.CenterHorizontally</span>
+<span class="fc" id="L220">                Column(</span>
+<span class="fc" id="L221">                    modifier = Modifier</span>
+<span class="fc" id="L222">                        .fillMaxWidth()</span>
+<span class="fc" id="L223">                        .padding(vertical = 32.dp),</span>
+<span class="fc" id="L224">                    horizontalAlignment = Alignment.CenterHorizontally</span>
                 ) {
-<span class="fc" id="L228">                    Text(&quot;⚠️&quot;, style = MaterialTheme.typography.headlineLarge)</span>
-<span class="fc" id="L229">                    Spacer(Modifier.height(8.dp))</span>
-<span class="fc" id="L230">                    Text(&quot;Error Loading Data&quot;, style = MaterialTheme.typography.titleMedium, color = Color(0xFF666666))</span>
-<span class="pc bpc" id="L231" title="1 of 2 branches missed.">                    Text(uiState.error ?: &quot;Unknown error&quot;, style = MaterialTheme.typography.bodySmall, color = Color(0xFF999999))</span>
-<span class="fc" id="L232">                }</span>
-<span class="fc bfc" id="L233" title="All 2 branches covered.">            } else if (standups.isEmpty()) {</span>
-<span class="fc" id="L234">                Column(</span>
-<span class="fc" id="L235">                    modifier = Modifier</span>
-<span class="fc" id="L236">                        .fillMaxWidth()</span>
-<span class="fc" id="L237">                        .padding(vertical = 32.dp),</span>
-<span class="fc" id="L238">                    horizontalAlignment = Alignment.CenterHorizontally</span>
+<span class="fc" id="L226">                    Text(&quot;⚠️&quot;, style = MaterialTheme.typography.headlineLarge)</span>
+<span class="fc" id="L227">                    Spacer(Modifier.height(8.dp))</span>
+<span class="fc" id="L228">                    Text(&quot;Error Loading Data&quot;, style = MaterialTheme.typography.titleMedium, color = Color(0xFF666666))</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                    Text(uiState.error ?: &quot;Unknown error&quot;, style = MaterialTheme.typography.bodySmall, color = Color(0xFF999999))</span>
+<span class="fc" id="L230">                }</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">            } else if (standups.isEmpty()) {</span>
+<span class="fc" id="L232">                Column(</span>
+<span class="fc" id="L233">                    modifier = Modifier</span>
+<span class="fc" id="L234">                        .fillMaxWidth()</span>
+<span class="fc" id="L235">                        .padding(vertical = 32.dp),</span>
+<span class="fc" id="L236">                    horizontalAlignment = Alignment.CenterHorizontally</span>
                 ) {
-<span class="fc" id="L240">                    Text(&quot;📄&quot;, style = MaterialTheme.typography.headlineLarge)</span>
-<span class="fc" id="L241">                    Spacer(Modifier.height(8.dp))</span>
-<span class="fc" id="L242">                    Text(stringResource(R.string.export_no_data), style = MaterialTheme.typography.titleMedium, color = Color(0xFF666666))</span>
-<span class="fc" id="L243">                    Text(stringResource(R.string.export_no_data_sub), style = MaterialTheme.typography.bodySmall, color = Color(0xFF999999))</span>
-<span class="fc" id="L244">                }</span>
-<span class="fc" id="L245">            } else {</span>
-<span class="fc" id="L246">                Card(</span>
-<span class="fc" id="L247">                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),</span>
-<span class="fc" id="L248">                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),</span>
-<span class="fc" id="L249">                    colors = CardDefaults.cardColors(containerColor = Color.White)</span>
-<span class="fc" id="L250">                ) {</span>
+<span class="fc" id="L238">                    Text(&quot;📄&quot;, style = MaterialTheme.typography.headlineLarge)</span>
+<span class="fc" id="L239">                    Spacer(Modifier.height(8.dp))</span>
+<span class="fc" id="L240">                    Text(stringResource(R.string.export_no_data), style = MaterialTheme.typography.titleMedium, color = Color(0xFF666666))</span>
+<span class="fc" id="L241">                    Text(stringResource(R.string.export_no_data_sub), style = MaterialTheme.typography.bodySmall, color = Color(0xFF999999))</span>
+<span class="fc" id="L242">                }</span>
+<span class="fc" id="L243">            } else {</span>
+<span class="fc" id="L244">                Card(</span>
+<span class="fc" id="L245">                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),</span>
+<span class="fc" id="L246">                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),</span>
+<span class="fc" id="L247">                    colors = CardDefaults.cardColors(containerColor = Color.White)</span>
+<span class="fc" id="L248">                ) {</span>
                     Column(Modifier.padding(16.dp)) {
                         Row(
                             Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(stringResource(R.string.export_preview), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            Text(stringResource(R.string.export_count, standups.size), color = Color(0xFF666666))
+                            Text(&quot;${standups.size} submitted, ${uiState.missingNames.size} missing&quot;, color = Color(0xFF666666))
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = standupsToMarkdown(uiState.selectedDate, standups),
+                            text = standupsToMarkdown(uiState.selectedDate, standups, uiState.missingNames),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF333333),
                             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
@@ -268,9 +266,9 @@ fun ExportScreen(
                     }
                 }
             }
-<span class="fc" id="L271">        }</span>
-<span class="fc" id="L272">    }</span>
-<span class="pc bpc" id="L273" title="1 of 2 branches missed.">}</span>
+<span class="fc" id="L269">        }</span>
+<span class="fc" id="L270">    }</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">}</span>
 
 data class ExportStandupUiModel(
     val name: String,
@@ -281,29 +279,50 @@ data class ExportStandupUiModel(
     val editedAt: String?
 )
 
-fun standupsToMarkdown(date: String, standups: List&lt;ExportStandupUiModel&gt;): String {
-<span class="fc bfc" id="L285" title="All 2 branches covered.">    if (standups.isEmpty()) return &quot;# Team Standups - $date\n\nNo standups for this date.\n&quot;</span>
-<span class="fc" id="L286">    return buildString {</span>
-<span class="fc" id="L287">        appendLine(&quot;# Team Standups - $date\n&quot;)</span>
-<span class="fc bfc" id="L288" title="All 2 branches covered.">        for (s in standups) {</span>
-<span class="fc" id="L289">            appendLine(&quot;## ${s.name} (${s.time})&quot;)</span>
-<span class="fc" id="L290">            appendLine(&quot;- Yesterday: ${s.yesterday}&quot;)</span>
-<span class="fc" id="L291">            appendLine(&quot;- Today: ${s.today}&quot;)</span>
-<span class="pc bpc" id="L292" title="2 of 6 branches missed.">            appendLine(&quot;- Blockers: ${s.blockers?.ifBlank { &quot;None&quot; } ?: &quot;None&quot;}&quot;)</span>
-<span class="pc bpc" id="L293" title="4 of 6 branches missed.">            if (!s.editedAt.isNullOrBlank()) appendLine(&quot;- Edited: ${s.editedAt}&quot;)</span>
-<span class="fc" id="L294">            appendLine()</span>
+<span class="nc" id="L282">fun standupsToMarkdown(date: String, standups: List&lt;ExportStandupUiModel&gt;, missingNames: List&lt;String&gt; = emptyList()): String {</span>
+<span class="fc" id="L283">    val missingCount = missingNames.size</span>
+<span class="fc" id="L284">    val submittedCount = standups.size</span>
+
+<span class="pc bpc" id="L286" title="1 of 4 branches missed.">    if (standups.isEmpty() &amp;&amp; missingNames.isEmpty()) {</span>
+<span class="fc" id="L287">        return &quot;# Team Standups - $date\n\nNo standups for this date.\n&quot;</span>
+    }
+
+<span class="fc" id="L290">    return buildString {</span>
+<span class="fc" id="L291">        appendLine(&quot;# Team Standups - $date\n&quot;)</span>
+<span class="fc" id="L292">        appendLine(&quot;**Submitted:** $submittedCount | **Missing:** $missingCount\n&quot;)</span>
+
+        // Show submitted standups
+<span class="pc bpc" id="L295" title="2 of 4 branches missed.">        if (standups.isNotEmpty()) {</span>
+<span class="fc" id="L296">            appendLine(&quot;## Submitted Standups\n&quot;)</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">            for (s in standups) {</span>
+<span class="fc" id="L298">                appendLine(&quot;### ${s.name} (${s.time})&quot;)</span>
+<span class="fc" id="L299">                appendLine(&quot;- Yesterday: ${s.yesterday}&quot;)</span>
+<span class="fc" id="L300">                appendLine(&quot;- Today: ${s.today}&quot;)</span>
+<span class="pc bpc" id="L301" title="1 of 6 branches missed.">                appendLine(&quot;- Blockers: ${s.blockers?.ifBlank { &quot;None&quot; } ?: &quot;None&quot;}&quot;)</span>
+<span class="pc bpc" id="L302" title="4 of 6 branches missed.">                if (!s.editedAt.isNullOrBlank()) appendLine(&quot;- Edited: ${s.editedAt}&quot;)</span>
+<span class="fc" id="L303">                appendLine()</span>
+            }
         }
-<span class="fc" id="L296">    }</span>
+
+        // Show missing members
+<span class="fc bfc" id="L308" title="All 4 branches covered.">        if (missingNames.isNotEmpty()) {</span>
+<span class="fc" id="L309">            appendLine(&quot;## Missing Standups ($missingCount)\n&quot;)</span>
+<span class="fc bfc" id="L310" title="All 2 branches covered.">            for (name in missingNames) {</span>
+<span class="fc" id="L311">                appendLine(&quot;- $name&quot;)</span>
+            }
+<span class="fc" id="L313">            appendLine()</span>
+        }
+<span class="fc" id="L315">    }</span>
 }
 
 @Preview(showBackground = true, name = &quot;Export Standup&quot;)
 @Composable
-<span class="nc bnc" id="L301" title="All 6 branches missed.">fun PreviewExportScreen() {</span>
+<span class="nc bnc" id="L320" title="All 6 branches missed.">fun PreviewExportScreen() {</span>
     // Preview without ViewModel - just show the UI structure
-<span class="nc bnc" id="L303" title="All 2 branches missed.">    MaterialTheme {</span>
+<span class="nc bnc" id="L322" title="All 2 branches missed.">    MaterialTheme {</span>
         Column(Modifier.fillMaxSize()) {
             Text(&quot;Export Screen Preview&quot;)
         }
     }
-<span class="nc bnc" id="L308" title="All 2 branches missed.">}</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">}</span>
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -21,12 +21,13 @@ import com.example.logger.R
 fun MissingScreen(
     pendingMembers: List&lt;String&gt;, // Actual list of members who haven't submitted
     onNavigateBack: () -&gt; Unit,
-    onSubmitStandup: (String) -&gt; Unit // Pass member name
-<span class="pc bpc" id="L25" title="9 of 18 branches missed.">) {</span>
-<span class="fc" id="L26">    val pendingCount = pendingMembers.size</span>
+<span class="pc bfc" id="L24" title="All 2 branches covered.">    onSubmitStandup: (String) -&gt; Unit = {}, // Pass member name</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">    showSubmitButton: Boolean = false // Control submit button visibility</span>
+<span class="pc bpc" id="L26" title="11 of 30 branches missed.">) {</span>
+<span class="fc" id="L27">    val pendingCount = pendingMembers.size</span>
 
-<span class="pc bpc" id="L28" title="1 of 2 branches missed.">    Scaffold(</span>
-<span class="fc" id="L29">        topBar = {</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">    Scaffold(</span>
+<span class="fc" id="L30">        topBar = {</span>
             TopAppBar(
                 title = { Text(stringResource(R.string.missing_title), color = MaterialTheme.colorScheme.onPrimary) },
                 navigationIcon = {
@@ -37,7 +38,7 @@ fun MissingScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
             )
         }
-<span class="fc" id="L40">    ) { inner -&gt;</span>
+<span class="fc" id="L41">    ) { inner -&gt;</span>
         Column(modifier = Modifier.fillMaxSize().padding(inner).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column {
                 val suffix = if (pendingCount == 1) &quot;&quot; else &quot;s&quot;
@@ -74,10 +75,12 @@ fun MissingScreen(
                                     Text(name, style = MaterialTheme.typography.titleMedium)
                                     Text(stringResource(R.string.missing_row_subtitle), style = MaterialTheme.typography.bodySmall, color = Color(0xFFD32F2F))
                                 }
-                                Button(onClick = { onSubmitStandup(name) }) {
-                                    Icon(Icons.Outlined.EditNote, contentDescription = null)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(&quot;Submit&quot;)
+                                if (showSubmitButton) {
+                                    Button(onClick = { onSubmitStandup(name) }) {
+                                        Icon(Icons.Outlined.EditNote, contentDescription = null)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(&quot;Submit&quot;)
+                                    }
                                 }
                             }
                         }
@@ -86,5 +89,5 @@ fun MissingScreen(
             }
         }
     }
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">}</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">}</span>
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -122,7 +122,7 @@ fun HomeScreen(
     onLoadMore: () -&gt; Unit,
     onViewRoster: () -&gt; Unit,
 <span class="pc bpc" id="L124" title="1 of 2 branches missed.">    onNavigateToSentimentAnalysis: (() -&gt; Unit)? = null,</span>
-<span class="pc bpc" id="L125" title="10 of 54 branches missed.">) {</span>
+<span class="pc bpc" id="L125" title="9 of 54 branches missed.">) {</span>
 <span class="fc" id="L126">    when {</span>
 <span class="fc bfc" id="L127" title="All 2 branches covered.">        state.isLoading -&gt; Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {</span>
 <span class="fc" id="L128">            CircularProgressIndicator(modifier = Modifier.semantics { contentDescription = &quot;Progress indicator&quot; })</span>
@@ -306,7 +306,7 @@ fun HomeScreen(
             }
         }
     }
-<span class="pc bfc" id="L309" title="All 2 branches covered.">}</span>
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">}</span>
 
 @Composable
 <span class="pc bpc" id="L312" title="6 of 10 branches missed.">private fun RowHeader(onExport: () -&gt; Unit) {</span>

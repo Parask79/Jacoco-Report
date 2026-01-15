@@ -13,14 +13,16 @@ import javax.inject.Inject
 <span class="nc" id="L13">        page: Int? = null,</span>
 <span class="nc" id="L14">        size: Int? = null,</span>
 <span class="fc" id="L15">        teamMemberId: Long? = null,</span>
-<span class="nc" id="L16">        standupDate: String? = null</span>
+<span class="nc" id="L16">        standupDate: String? = null,</span>
+<span class="fc" id="L17">        status: String? = null</span>
     ): NetworkResult&lt;PaginatedStandupEntriesData&gt; {
-<span class="fc" id="L18">        return repository.getStandupEntries(</span>
-<span class="fc" id="L19">            teamId = teamId,</span>
-<span class="fc" id="L20">            page = page,</span>
-<span class="fc" id="L21">            size = size,</span>
-<span class="fc" id="L22">            teamMemberId = teamMemberId,</span>
-<span class="fc" id="L23">            standupDate = standupDate</span>
+<span class="fc" id="L19">        return repository.getStandupEntries(</span>
+<span class="fc" id="L20">            teamId = teamId,</span>
+<span class="fc" id="L21">            page = page,</span>
+<span class="fc" id="L22">            size = size,</span>
+<span class="fc" id="L23">            teamMemberId = teamMemberId,</span>
+<span class="fc" id="L24">            standupDate = standupDate,</span>
+<span class="fc" id="L25">            status = status</span>
         )
     }
 }
